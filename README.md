@@ -4,7 +4,7 @@ A fun & unique 24/7 robbery script for ESX. Rob the registers, hack the computer
 ## Features
 - Supports ESX / easy to convert
 - Highly detailed config file
-- Preconfigured for Gabz 24/7 (easily update the coords for other 24/7 maps/default)
+- Preconfigured for default 24/7 (if you use Gabz, the coords are in the gabz247coords.lua file)
 - Customize payouts to player
 - Enable/disable requiring a police presence in the city
 - Configurable individual cooldowns for registers & safes
