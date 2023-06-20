@@ -22,7 +22,7 @@ A fun & unique 24/7 robbery script for ESX. Rob the registers, hack the computer
 - Add 'ensure lation_247robbery' in your 'server.cgf'
 
 ## Preview
-[Coming soon..]()
+[Streamable - Lation's 24/7 Robbery](https://streamable.com/di1au4)
 
 ## Join Discord
 [Click here to join our Discord](https://discord.gg/9EbY4nM5uu)
