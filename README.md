@@ -1,5 +1,7 @@
 # Lation's 24/7 Robbery
-A fun & unique 24/7 robbery script for ESX. Rob the registers, hack the computer for a security code & use that code to get access to the safe for even more money.
+A fun & unique 24/7 robbery script for ESX. Rob the registers, hack the computer for a security code & use that code to get access to the safe for even more money. There is global cooldowns that restrict players from chain-robbing. If you fail hacking the computer too many times (configurable) you will fail the robbery and have to start over. If you try unlocking the safe unsuccessfully too many times (configurable) you will fail the robbery and have to start over. Every robbery will generate a new & unique "PIN" to unlock the safe. Furthermore, there is a small chance you can get lucky & find a note under the register that gives you the safe's PIN and allows you to skip hacking the computer at all! This chance is configurable. 
+
+This script requires "ps-ui" listed below for the hacking minigame.
 
 ## Features
 - Supports ESX / easy to convert
