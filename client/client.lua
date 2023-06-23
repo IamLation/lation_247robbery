@@ -203,13 +203,50 @@ end
 function initiateComputerHack()
     activeComputer = false -- Deactivates target option
     if failedHack < Config.MaxHackAttempts then -- Checks hack attempts
+        lib.requestAnimDict('anim@heists@prison_heiststation@cop_reactions', 100)
         TaskPlayAnim(cache.ped, 'anim@heists@prison_heiststation@cop_reactions', 'cop_b_idle', 8.0, 8.0, -1, 1, 1, 0, 0, 0)
-        exports['ps-ui']:Scrambler(function(success)
-            if success then -- Player passes the hack
+        if Config.EnableQuestionnaire then 
+            local questions = lib.inputDialog('Security Questions', {
+                {type = 'input', label = 'Question #1', description = Config.Questions.question1.question, required = true, icon = Config.Questions.question1.icon},
+                {type = 'input', label = 'Question #2', description = Config.Questions.question2.question, required = true, icon = Config.Questions.question2.icon},
+                {type = 'input', label = 'Question #3', description = Config.Questions.question3.question, required = true, icon = Config.Questions.question3.icon},
+                {type = 'select', label = 'Question #4', description = Config.Questions.question4.question, options = {
+                    { value = '1', label = Config.Questions.question4.options.option1 },
+                    { value = '2', label = Config.Questions.question4.options.option2 },
+                    { value = '3', label = Config.Questions.question4.options.option3 },
+                    { value = '4', label = Config.Questions.question4.options.option4 }
+                }, required = true, icon = Config.Questions.question4.icon}
+            })
+            if string.lower(questions[1]) == string.lower(Config.Answers.question1Answer) and string.lower(questions[2]) == string.lower(Config.Answers.question2Answer) 
+            and string.lower(questions[3]) == string.lower(Config.Answers.question3Answer) and string.lower(questions[4]) == tostring(Config.Answers.question4Answer) then 
+                failedHack = 0
                 ClearPedTasks(cache.ped)
                 generatedCode = math.random(1111, 9999)
                 safePin = generatedCode
-                Wait(1000)
+                lib.alertDialog({
+                    header = AlertDialog.computerHeader,
+                    content = AlertDialog.computerContent ..generatedCode,
+                    centered = true,
+                    cancel = false,
+                    labels = {
+                        confirm = AlertDialog.computerConfirmButton
+                    }
+                })
+                activeSafe = true
+            else
+                ClearPedTasks(cache.ped)
+                activeComputer = true
+                failedHack = failedHack + 1
+                lib.notify({ id = 'failedHack', title = Notify.title, description = Notify.failedHack, icon = Notify.icon, type = 'error', position = Notify.position })
+                -- Add another dispatch notification here, if desired
+            end
+        else
+            local success = lib.skillCheck(Config.ComputerDifficulty, Config.ComputerInput)
+            if success then -- Player passes the hack
+                failedHack = 0
+                ClearPedTasks(cache.ped)
+                generatedCode = math.random(1111, 9999)
+                safePin = generatedCode
                 lib.alertDialog({
                     header = AlertDialog.computerHeader,
                     content = AlertDialog.computerContent ..generatedCode,
@@ -227,7 +264,7 @@ function initiateComputerHack()
                 lib.notify({ id = 'failedHack', title = Notify.title, description = Notify.failedHack, icon = Notify.icon, type = 'error', position = Notify.position })
                 -- Add another dispatch notification here, if desired
             end
-        end, "numeric", 30, 0)
+        end
     else -- Player has failed the hack too many times, robbery ends/restarts
         activeRegister = false
         activeComputer = false

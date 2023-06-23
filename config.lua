@@ -31,8 +31,43 @@ Config.SafeRewardMaxQuantity = 10000 -- If SafeRewardRandom = true then this is 
 
 --[[ Computer Configs ]]
 Config.MaxHackAttempts = 3 -- The maximum amount of hack attempts to get the safe code before having to restart robbery
+Config.EnableQuestionnaire = true -- If true, the player will be asked a sequence of questions instead of the skillcheck below to hack the computer
+Config.ComputerDifficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', 'easy', 'easy', 'easy', 'easy' } -- The skillcheck difficulty, can be 'easy', 'medium' or 'hard' in any order and any quantity (If EnableQuestionnaire is true, this can be ignored)
+Config.ComputerInput = { 'W', 'A', 'S', 'D' } -- The keys that are used for the skillcheck minigame, can be any keys (If EnableQuestionnaire is true, this can be ignored)
 
---[[ Store Location Configs, Default 24/7 ]]
+Config.Questions = { -- This is only used if Config.EnableQuestionnaire is true
+    question1 = {
+        question = 'What is a PSU?',
+        icon = 'bolt'
+    },
+    question2 = {
+        question = 'What does "HTTPS" stand for?',
+        icon = 'lock'
+    },
+    question3 = {
+        question = 'What is a GPU?',
+        icon = 'desktop'
+    },
+    question4 = { -- This question is not typed but rather the player selects from a dropdown, the dropdown options displayed are below
+        question = 'What does CTRL + A do?',
+        icon = 'keyboard',
+        options = {
+            option1 = 'Copy text',
+            option2 = 'Paste text',
+            option3 = 'Select all',
+            option4 = 'Print page'
+        }
+    },
+}
+
+Config.Answers = { -- This is only used if Config.EnableQuestionnaire is true
+    question1Answer = 'power supply unit',
+    question2Answer = 'hypertext transfer protocol secure',
+    question3Answer = 'graphics processing unit',
+    question4Answer = 3 -- Just the option number of the correct answer from above (option1 = 1, option2 = 2, etc)
+}
+
+--[[ Store Location Configs ]]
 Config.Locations = {
     Registers = {
         vec3(24.94561958313, -1344.9544677734, 29.611698150635), -- Innocence Blvd
