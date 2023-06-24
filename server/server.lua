@@ -18,33 +18,63 @@ lib.callback.register('lation_247robbery:policeCount', function(policeCount)
 end)
 
 -- Function that rewards the player upon a successful register robbery
-lib.callback.register('lation_247robbery:registerSuccessful', function()
+lib.callback.register('lation_247robbery:registerSuccessful', function(source, verifyReward)
     local source = source
     local ped = ESX.GetPlayerFromId(source)
-    if Config.RegisterRewardRandom then
-        local rewardQuantity = math.random(Config.RegisterRewardMinQuantity, Config.RegisterRewardMaxQuantity)
-        ox_inventory:AddItem(ped.source, Config.RegisterRewardItem, rewardQuantity)
-        -- Reward more/another item here, etc
+    local distanceCheck = lib.callback.await('lation_247robbery:verifyDistance', source)
+    if verifyReward == true then
+        if distanceCheck then
+            if Config.RegisterRewardRandom then
+                local rewardQuantity = math.random(Config.RegisterRewardMinQuantity, Config.RegisterRewardMaxQuantity)
+                ox_inventory:AddItem(ped.source, Config.RegisterRewardItem, rewardQuantity)
+                return true
+                -- Reward more/another item here, etc
+            else
+                ox_inventory:AddItem(ped.source, Config.RegisterRewardItem, Config.RegisterRewardQuantity)
+                return true
+                -- Reward more/another item here, etc
+            end
+            registerCooldown()
+        else
+            -- Potential cheating if player is not nearby any of the store coords
+            print('Player: ' ..ped.getName().. ' (ID: '..ped.source..') has attempted to get rewarded for a register robbery despite not being within range of any 24/7.')
+            return false
+        end
     else
-        ox_inventory:AddItem(ped.source, Config.RegisterRewardItem, Config.RegisterRewardQuantity)
-        -- Reward more/another item here, etc
+        -- Potential cheating if verifyReward is false?
+        print('Player: ' ..ped.getName().. ' (ID: '..ped.source..') has attempted to get rewarded for a register robbery despite verifyReward not being true')
+        return false 
     end
-    registerCooldown()
 end)
 
 -- Function that rewards the player upon a successful safe robbery
-lib.callback.register('lation_247robbery:safeSuccessful', function()
+lib.callback.register('lation_247robbery:safeSuccessful', function(source, verifyReward)
     local source = source
     local ped = ESX.GetPlayerFromId(source)
-    if Config.SafeRewardRandom then
-        local rewardQuantity = math.random(Config.SafeRewardMinQuantity, Config.SafeRewardMaxQuantity)
-        ox_inventory:AddItem(ped.source, Config.SafeRewardItem, rewardQuantity)
-        -- Reward more/another item here, etc
+    local distanceCheck = lib.callback.await('lation_247robbery:verifyDistance', source)
+    if verifyReward == true then
+        if distanceCheck then 
+            if Config.SafeRewardRandom then
+                local rewardQuantity = math.random(Config.SafeRewardMinQuantity, Config.SafeRewardMaxQuantity)
+                ox_inventory:AddItem(ped.source, Config.SafeRewardItem, rewardQuantity)
+                return true
+                -- Reward more/another item here, etc
+            else
+                ox_inventory:AddItem(ped.source, Config.SafeRewardItem, Config.SafeRewardQuantity)
+                return true
+                -- Reward more/another item here, etc
+            end
+            safeCooldown()
+        else
+            -- Potential cheating if player is not nearby any of the store coords
+            print('Player: ' ..ped.getName().. ' (ID: '..ped.source..') has attempted to get rewarded for a safe robbery despite not being within range of any 24/7.')
+            return false 
+        end
     else
-        ox_inventory:AddItem(ped.source, Config.SafeRewardItem, Config.SafeRewardQuantity)
-        -- Reward more/another item here, etc
+        -- Potential cheating if verifyReward is false?
+        print('Player: ' ..ped.getName().. ' (ID: '..ped.source..') has attempted to get rewarded for a safe robbery despite verifyReward not being true')
+        return false
     end
-    safeCooldown()
 end)
 
 -- Function that gets the passed item & quantity and removes it

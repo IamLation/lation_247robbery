@@ -8,6 +8,8 @@ local generatedCode = nil
 local safePin = nil
 local wrongPIN = 0
 local failedHack = 0
+local verifyReward = false
+local registeredCoords = {}
 
 -- Creates all the targets for the registers noted in the Config
 for k, v in pairs(Config.Locations.Registers) do
@@ -159,7 +161,14 @@ function initiateRegisterRobbery()
                             -- Player gets rewarded, cooldown begins
                             -- The safe becomes available, player must simply input the code to unlock
                             activeSafe = true
-                            lib.callback('lation_247robbery:registerSuccessful')
+                            verifyReward = true
+                            local reward = lib.callback.await('lation_247robbery:registerSuccessful', false, verifyReward)
+                            if reward then 
+                                verifyReward = false 
+                            else
+                                -- Kick/drop player? Potential cheating?
+                                verifyReward = false
+                            end
                         else
                             -- Player responded "Who Cares?" to the code they received, so robbery ends (meme'd)
                             -- Player is not rewarded
@@ -171,7 +180,14 @@ function initiateRegisterRobbery()
                         -- Player gets rewarded, cooldown begins
                         -- The computer becomes available, player must simply complete a hack to proceed
                         activeComputer = true
-                        lib.callback('lation_247robbery:registerSuccessful')
+                        verifyReward = true
+                        local reward = lib.callback.await('lation_247robbery:registerSuccessful', false, verifyReward)
+                        if reward then 
+                            verifyReward = false 
+                        else
+                            -- Kick/drop player? Potential cheating?
+                            verifyReward = false
+                        end
                     end
                 else
                     -- Player cancelled the cash register robbery progress, so robbery ends
@@ -299,7 +315,14 @@ function initiateSafeRobbery()
                 anim = { dict = 'anim@heists@ornate_bank@grab_cash', clip = 'grab' }
             }) then
                 activeRegister = false
-                lib.callback('lation_247robbery:safeSuccessful')
+                verifyReward = true
+                local reward = lib.callback.await('lation_247robbery:safeSuccessful', false, verifyReward)
+                if reward then 
+                    verifyReward = false 
+                else
+                    -- Kick/drop player? Potential cheating?
+                    verifyReward = false
+                end
             else
                 -- cancelled looting the safe
                 -- notify of cancel
@@ -314,3 +337,26 @@ function initiateSafeRobbery()
         lib.notify({ id = 'tooManyFails', title = Notify.title, description = Notify.tooManySafeFails, icon = Notify.icon, type = 'error', position = Notify.position })
     end
 end
+
+-- Function to run through all the register locations and store coords in a table
+function verifyCoords()
+    local coords = {}
+    for k, v in pairs(Config.Locations.Registers) do 
+        table.insert(coords, v)
+    end
+    return coords
+end
+
+-- Callback to check that the player is within 10 units of any 24/7 register to reward the money/item 
+lib.callback.register('lation_247robbery:verifyDistance', function(source, result)
+    registeredCoords = verifyCoords()
+    local playerCoords = GetEntityCoords(cache.ped)
+    for _, coord in ipairs(registeredCoords) do
+        local distance = GetDistanceBetweenCoords(playerCoords, coord.x, coord.y, coord.z, true)
+        if distance < 10.0 then
+            return true
+        else
+            return false
+        end
+    end
+end)
