@@ -1,0 +1,15 @@
+{
+    "Lua.diagnostics.globals": [
+        "lib",
+        "ESX",
+        "registerCooldown",
+        "safeCooldown",
+        "initiateSafeRobbery",
+        "cache",
+        "initiateComputerHack",
+        "checkConditions",
+        "policeCount",
+        "QBCore",
+        "QBShared"
+    ]
+}

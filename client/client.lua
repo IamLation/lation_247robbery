@@ -9,7 +9,14 @@ local safePin = nil
 local wrongPIN = 0
 local failedHack = 0
 local verifyReward = false
-local registeredCoords = {}
+
+if Config.Framework == 'esx' then
+    ESX = exports["es_extended"]:getSharedObject()
+elseif Config.Framework == 'qbcore' then
+    QBCore = exports['qb-core']:GetCoreObject()
+else
+    -- Custom framework
+end
 
 -- Creates all the targets for the registers noted in the Config
 for k, v in pairs(Config.Locations.Registers) do
@@ -96,7 +103,7 @@ end
 -- Function that checks that all conditions have been met before proceeding
 function checkConditions()
     if Config.RequirePolice then
-        local policeCount = lib.callback.await('lation_247robbery:policeCount', policeCount)
+        local policeCount = lib.callback.await('lation_247robbery:policeCount', false)
         if policeCount >= Config.PoliceCount then
             local hasItem = ox_inventory:Search('count', Config.RegisterRobberyItem)
             if hasItem >= 1 then
@@ -163,8 +170,8 @@ function initiateRegisterRobbery()
                             activeSafe = true
                             verifyReward = true
                             local reward = lib.callback.await('lation_247robbery:registerSuccessful', false, verifyReward)
-                            if reward then 
-                                verifyReward = false 
+                            if reward then
+                                verifyReward = false
                             else
                                 -- Kick/drop player? Potential cheating?
                                 verifyReward = false
@@ -182,8 +189,8 @@ function initiateRegisterRobbery()
                         activeComputer = true
                         verifyReward = true
                         local reward = lib.callback.await('lation_247robbery:registerSuccessful', false, verifyReward)
-                        if reward then 
-                            verifyReward = false 
+                        if reward then
+                            verifyReward = false
                         else
                             -- Kick/drop player? Potential cheating?
                             verifyReward = false
@@ -221,7 +228,7 @@ function initiateComputerHack()
     if failedHack < Config.MaxHackAttempts then -- Checks hack attempts
         lib.requestAnimDict('anim@heists@prison_heiststation@cop_reactions', 100)
         TaskPlayAnim(cache.ped, 'anim@heists@prison_heiststation@cop_reactions', 'cop_b_idle', 8.0, 8.0, -1, 1, 1, 0, 0, 0)
-        if Config.EnableQuestionnaire then 
+        if Config.EnableQuestionnaire then
             local questions = lib.inputDialog('Security Questions', {
                 {type = 'input', label = 'Question #1', description = Config.Questions.question1.question, required = true, icon = Config.Questions.question1.icon},
                 {type = 'input', label = 'Question #2', description = Config.Questions.question2.question, required = true, icon = Config.Questions.question2.icon},
@@ -301,7 +308,7 @@ function initiateSafeRobbery()
             wrongPIN = wrongPIN + 1
             activeSafe = true
             lib.notify({ id = 'wrongPIN', title = Notify.title, description = Notify.wrongPin, icon = Notify.icon, type = 'error', position = Notify.position })
-            -- Add another dispatch notification here, if desired
+            -- Add another dispatch notification here, if desired for player inputting wrong PIN on safe
         elseif convertedCode == safePin then -- Correct PIN
             activeSafe = false
             wrongPIN = 0
@@ -337,26 +344,3 @@ function initiateSafeRobbery()
         lib.notify({ id = 'tooManyFails', title = Notify.title, description = Notify.tooManySafeFails, icon = Notify.icon, type = 'error', position = Notify.position })
     end
 end
-
--- Function to run through all the register locations and store coords in a table
-function verifyCoords()
-    local coords = {}
-    for k, v in pairs(Config.Locations.Registers) do 
-        table.insert(coords, v)
-    end
-    return coords
-end
-
--- Callback to check that the player is within 10 units of any 24/7 register to reward the money/item 
-lib.callback.register('lation_247robbery:verifyDistance', function(source, result)
-    registeredCoords = verifyCoords()
-    local playerCoords = GetEntityCoords(cache.ped)
-    for _, coord in ipairs(registeredCoords) do
-        local distance = GetDistanceBetweenCoords(playerCoords, coord.x, coord.y, coord.z, true)
-        if distance < 10.0 then
-            return true
-        else
-            return false
-        end
-    end
-end)
