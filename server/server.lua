@@ -129,11 +129,17 @@ lib.callback.register('lation_247robbery:safeSuccessful', function(source, verif
             elseif Config.Framework == 'qbcore' then
                 local player = QBCore.Functions.GetPlayer(source)
                 if Config.SafeRewardRandom then
-                    player.Functions.AddItem(Config.SafeRewardItem, rewardQuantity)
+                    local reward = {
+                        worth = rewardQuantity
+                    }
+                    player.Functions.AddItem(Config.SafeRewardItem, 1, false, reward)
                     safeCooldown()
                     return true
                 else
-                    player.Functions.AddItem(Config.SafeRewardItem, Config.SafeRewardQuantity)
+                    local reward = {
+                        worth = Config.SafeRewardQuantity
+                    }
+                    player.Functions.AddItem(Config.SafeRewardItem, 1, false, reward)
                     safeCooldown()
                     return true
                 end
