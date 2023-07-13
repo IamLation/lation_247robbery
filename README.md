@@ -17,7 +17,7 @@ A fun & unique 24/7 robbery script for ESX & QBCore. Rob the registers, hack the
 
 ## Dependencies
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
-- [ox_target](https://github.com/overextended/ox_lib/releases), [qb-target](https://github.com/qbcore-framework/qb-target) or [qtarget](https://github.com/overextended/ox_lib/releases)
+- [ox_target](https://github.com/overextended/ox_target/releases), [qb-target](https://github.com/qbcore-framework/qb-target) or [qtarget](https://github.com/overextended/ox_target/releases)
 
 ## Installation
 - Ensure you have all dependencies installed
