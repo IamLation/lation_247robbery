@@ -1,4 +1,4 @@
-local ox_target = exports.ox_target
+local qtarget = exports.qtarget
 local ox_inventory = exports.ox_inventory
 local activeRegister = false
 local activeComputer = false
@@ -20,11 +20,10 @@ end
 
 -- Creates all the targets for the registers noted in the Config
 for k, v in pairs(Config.Locations.Registers) do
-    ox_target:addSphereZone({
+    qtarget:AddCircleZone('cash_register' ..k, v, 0.35, {
         name = 'cash_register' ..k,
-        coords = v,
-        radius = 0.35,
-        debug = Target.debugTargets,
+        debugPoly = Target.debugTargets,
+    }, {
         options = {
             {
                 icon = Target.registerIcon,
@@ -36,23 +35,22 @@ for k, v in pairs(Config.Locations.Registers) do
                         return true
                     end
                 end,
-                onSelect = function()
+                action = function()
                     activeRegister = true
                     checkConditions()
-                end,
-                distance = 2
+                end
             }
         },
+        distance = 2,
     })
 end
 
 -- Creates all the targets for the computers noted in the Config
 for k, v in pairs(Config.Locations.Computers) do
-    ox_target:addSphereZone({
+    qtarget:AddCircleZone('computer' ..k, v, 0.35, {
         name = 'computer' ..k,
-        coords = v,
-        radius = 0.35,
-        debug = Target.debugTargets,
+        debugPoly = Target.debugTargets,
+    }, {
         options = {
             {
                 icon = Target.computerIcon,
@@ -64,22 +62,21 @@ for k, v in pairs(Config.Locations.Computers) do
                         return false
                     end
                 end,
-                onSelect = function()
+                action = function()
                     initiateComputerHack()
-                end,
-                distance = 2
+                end
             }
         },
+        distance = 2,
     })
 end
 
 -- Creates all the targets for the safes noted in the Config
 for k, v in pairs(Config.Locations.Safes) do
-    ox_target:addSphereZone({
+    qtarget:AddCircleZone('safe' ..k, v, 0.45, {
         name = 'safe' ..k,
-        coords = v,
-        radius = 0.45,
-        debug = Target.debugTargets,
+        debugPoly = Target.debugTargets,
+    }, {
         options = {
             {
                 icon = Target.safeIcon,
@@ -91,39 +88,79 @@ for k, v in pairs(Config.Locations.Safes) do
                         return false
                     end
                 end,
-                onSelect = function()
+                action = function()
                     initiateSafeRobbery()
-                end,
-                distance = 2
+                end
             }
         },
+        distance = 2,
     })
 end
 
 -- Function that checks that all conditions have been met before proceeding
 function checkConditions()
-    if Config.RequirePolice then
-        local policeCount = lib.callback.await('lation_247robbery:policeCount', false)
-        if policeCount >= Config.PoliceCount then
-            local hasItem = ox_inventory:Search('count', Config.RegisterRobberyItem)
-            if hasItem >= 1 then
+    if Config.Framework == 'esx' then
+        local hasItem = ESX.SearchInventory(Config.RegisterRobberyItem, 1)
+        if hasItem >= 1 then
+            if Config.RequirePolice then
+                local policeCount = lib.callback.await('lation_247robbery:policeCount', false)
+                if policeCount >= Config.PoliceCount then
+                    conditionsMet = true
+                    initiateRegisterRobbery()
+                else
+                    conditionsMet = false
+                    activeRegister = false
+                    lib.notify({ id = 'policeMissing', title = Notify.title, description = Notify.notEnoughPolice, icon = Notify.icon, type = 'error', position = Notify.position })
+                end
+            else
                 conditionsMet = true
                 initiateRegisterRobbery()
-            else
-                conditionsMet = false
-                activeRegister = false
-                lib.notify({ id = 'itemMissing', title = Notify.title, description = Notify.missingItem, icon = Notify.icon, type = 'error', position = Notify.position })
             end
         else
             conditionsMet = false
             activeRegister = false
-            lib.notify({ id = 'policeMissing', title = Notify.title, description = Notify.notEnoughPolice, icon = Notify.icon, type = 'error', position = Notify.position })
+            lib.notify({ id = 'itemMissing', title = Notify.title, description = Notify.missingItem, icon = Notify.icon, type = 'error', position = Notify.position })
+        end
+    elseif Config.Framework == 'qbcore' then
+        local hasItem = QBCore.Functions.HasItem(Config.RegisterRobberyItem)
+        if hasItem then
+            if Config.RequirePolice then
+                local policeCount = lib.callback.await('lation_247robbery:policeCount', false)
+                if policeCount >= Config.PoliceCount then
+                    conditionsMet = true
+                    initiateRegisterRobbery()
+                else
+                    conditionsMet = false
+                    activeRegister = false
+                    lib.notify({ id = 'policeMissing', title = Notify.title, description = Notify.notEnoughPolice, icon = Notify.icon, type = 'error', position = Notify.position })
+                end
+            else
+                conditionsMet = true
+                initiateRegisterRobbery()
+            end
+        else
+            conditionsMet = false
+            activeRegister = false
+            lib.notify({ id = 'itemMissing', title = Notify.title, description = Notify.missingItem, icon = Notify.icon, type = 'error', position = Notify.position })
         end
     else
+        -- Custom framework/standalone
         local hasItem = ox_inventory:Search('count', Config.RegisterRobberyItem)
         if hasItem >= 1 then
-            conditionsMet = true
-            initiateRegisterRobbery()
+            if Config.RequirePolice then
+                local policeCount = lib.callback.await('lation_247robbery:policeCount', false)
+                if policeCount >= Config.PoliceCount then
+                    conditionsMet = true
+                    initiateRegisterRobbery()
+                else
+                    conditionsMet = false
+                    activeRegister = false
+                    lib.notify({ id = 'policeMissing', title = Notify.title, description = Notify.notEnoughPolice, icon = Notify.icon, type = 'error', position = Notify.position })
+                end
+            else
+                conditionsMet = true
+                initiateRegisterRobbery()
+            end
         else
             conditionsMet = false
             activeRegister = false

@@ -60,20 +60,34 @@ lib.callback.register('lation_247robbery:registerSuccessful', function(source, v
     local source = source
     local playerName = GetPlayerName(source)
     local distanceCheck = checkPlayerDistance(source)
+    local rewardQuantity = math.random(Config.RegisterRewardMinQuantity, Config.RegisterRewardMaxQuantity)
     if verifyReward == true then
         if distanceCheck then
-            if Config.RegisterRewardRandom then
-                local rewardQuantity = math.random(Config.RegisterRewardMinQuantity, Config.RegisterRewardMaxQuantity)
-                ox_inventory:AddItem(source, Config.RegisterRewardItem, rewardQuantity)
-                -- Reward more/another item here, etc
-                registerCooldown()
-                return true
+            if Config.Framework == 'esx' then
+                local player = ESX.GetPlayerFromId(source)
+                if Config.RegisterRewardRandom then
+                    player.addInventoryItem(Config.RegisterRewardItem, rewardQuantity)
+                else
+                    player.addInventoryItem(Config.RegisterRewardItem, Config.RegisterRewardQuantity)
+                end
+            elseif Config.Framework == 'qbcore' then
+                local Player = QBCore.Functions.GetPlayer(source)
+                if Config.RegisterRewardRandom then
+                    print(rewardQuantity)
+                    Player.Functions.AddItem(Config.RegisterRewardItem, rewardQuantity)
+                else
+                    Player.Functions.AddItem(Config.RegisterRewardItem, Config.RegisterRewardQuantity)
+                end
             else
-                ox_inventory:AddItem(source, Config.RegisterRewardItem, Config.RegisterRewardQuantity)
-                -- Reward more/another item here, etc
-                registerCooldown()
-                return true
+                -- Custom framework/standalone
+                if Config.RegisterRewardRandom then
+                    ox_inventory:AddItem(source, Config.RegisterRewardItem, rewardQuantity)
+                else
+                    ox_inventory:AddItem(source, Config.RegisterRewardItem, Config.RegisterRewardQuantity)
+                end
             end
+            registerCooldown()
+            return true
         else
             -- Potential cheating if player is not nearby any of the store coords
             print('Player: ' ..playerName.. ' (ID: '..source..') has attempted to get rewarded for a register robbery despite not being within range of any 24/7.')
@@ -91,19 +105,42 @@ lib.callback.register('lation_247robbery:safeSuccessful', function(source, verif
     local source = source
     local playerName = GetPlayerName(source)
     local distanceCheck = checkPlayerDistance(source)
+    local rewardQuantity = math.random(Config.SafeRewardMinQuantity, Config.SafeRewardMaxQuantity)
     if verifyReward == true then
         if distanceCheck then
-            if Config.SafeRewardRandom then
-                local rewardQuantity = math.random(Config.SafeRewardMinQuantity, Config.SafeRewardMaxQuantity)
-                ox_inventory:AddItem(source, Config.SafeRewardItem, rewardQuantity)
-                -- Reward more/another item here, etc
-                safeCooldown()
-                return true
+            if Config.Framework == 'esx' then
+                local player = ESX.GetPlayerFromId(source)
+                if Config.SafeRewardRandom then
+                    player.addInventoryItem(Config.SafeRewardItem, rewardQuantity)
+                    safeCooldown()
+                    return true
+                else
+                    player.addInventoryItem(Config.SafeRewardItem, Config.SafeRewardQuantity)
+                    safeCooldown()
+                    return true
+                end
+            elseif Config.Framework == 'qbcore' then
+                local player = QBCore.Functions.GetPlayer(source)
+                if Config.SafeRewardRandom then
+                    player.Functions.AddItem(Config.SafeRewardItem, rewardQuantity)
+                    safeCooldown()
+                    return true
+                else
+                    player.Functions.AddItem(Config.SafeRewardItem, Config.SafeRewardQuantity)
+                    safeCooldown()
+                    return true
+                end
             else
-                ox_inventory:AddItem(source, Config.SafeRewardItem, Config.SafeRewardQuantity)
-                -- Reward more/another item here, etc
-                safeCooldown()
-                return true
+                -- Custom framework/standalone
+                if Config.SafeRewardRandom then
+                    ox_inventory:AddItem(source, Config.SafeRewardItem, rewardQuantity)
+                    safeCooldown()
+                    return true
+                else
+                    ox_inventory:AddItem(source, Config.SafeRewardItem, Config.SafeRewardQuantity)
+                    safeCooldown()
+                    return true
+                end
             end
         else
             -- Potential cheating if player is not nearby any of the store coords
@@ -119,7 +156,17 @@ end)
 
 -- Function that gets the passed item & quantity and removes it
 lib.callback.register('lation_247robbery:removeItem', function(source, item, quantity)
-    ox_inventory:RemoveItem(source, item, quantity)
+    local source = source
+    if Config.Framework == 'esx' then
+        local player = ESX.GetPlayerFromId(source)
+        player.removeInventoryItem(item, quantity)
+    elseif Config.Framework == 'qbcore' then
+        local player = QBCore.Functions.GetPlayer(source)
+        player.Functions.RemoveItem(item, quantity)
+    else
+        -- Custom framework/standalone
+        ox_inventory:RemoveItem(source, item, quantity)
+    end
 end)
 
 -- Function that handles the register cooldowns
