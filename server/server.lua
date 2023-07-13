@@ -73,10 +73,17 @@ lib.callback.register('lation_247robbery:registerSuccessful', function(source, v
             elseif Config.Framework == 'qbcore' then
                 local Player = QBCore.Functions.GetPlayer(source)
                 if Config.RegisterRewardRandom then
-                    print(rewardQuantity)
-                    Player.Functions.AddItem(Config.RegisterRewardItem, rewardQuantity)
+                    local reward = {
+                        worth = rewardQuantity
+                    }
+                    Player.Functions.AddItem(Config.RegisterRewardItem, 1, false, reward)
+                    TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[Config.RegisterRewardItem], "add")
                 else
-                    Player.Functions.AddItem(Config.RegisterRewardItem, Config.RegisterRewardQuantity)
+                    local reward = {
+                        worth = Config.RegisterRewardQuantity
+                    }
+                    Player.Functions.AddItem(Config.RegisterRewardItem, 1, false, reward)
+                    TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[Config.RegisterRewardItem], "add")
                 end
             else
                 -- Custom framework/standalone

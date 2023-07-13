@@ -13,7 +13,7 @@ Config.RegisterMinCooldown = 10 -- The minimum cooldown time for robbing registe
 Config.RegisterMaxCooldown = 20 -- The maximum cooldown time for robbing registers once one has been robbed
 Config.RegisterDiffuculty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', 'easy', 'easy', 'easy', 'easy' } -- The skillcheck difficulty, can be 'easy', 'medium' or 'hard' in any order and any quantity
 Config.RegisterInput = { 'W', 'A', 'S', 'D' } -- The keys that are used for the skillcheck minigame, can be any keys
-Config.RegisterRewardItem = 'black_money' -- The item that is rewarded upon a successful register robbery
+Config.RegisterRewardItem = 'black_money' -- The item that is rewarded upon a successful register robbery (Set to "markedbills" if using QBCore)
 Config.RegisterRewardRandom = true -- Set true if you want to reward a random quantity of the above item, otherwise set false
 Config.RegisterRewardQuantity = 1000 -- If RegisterRewardRandom = false then this is the quantity rewarded, if true then can be ignored
 Config.RegisterRewardMinQuantity = 1000 -- If RegisterRewardRandom = true then this is the minimum quantity, otherwise can be ignored
@@ -25,7 +25,7 @@ Config.CodeChance = 10 -- The percentage chance a player receives a code from th
 Config.SafeMinCooldown = 10 -- The minimum cooldown time for robbing safes once one has been robbed
 Config.SafeMaxCooldown = 20 -- The maximum cooldown time for robbing safes once one has been robbed
 Config.MaxCodeAttempts = 3 -- The maximum amount of attempts to input the correct code to unlock safe before having to restart robbery
-Config.SafeRewardItem = 'black_money' -- The item that is rewarded upon a successful safe robbery
+Config.SafeRewardItem = 'black_money' -- The item that is rewarded upon a successful safe robbery (Set to "markedbills" if using QBCore)
 Config.SafeRewardRandom = true -- Set true if you want to reward a random quantity of the above item, otherwise set false
 Config.SafeRewardQuantity = 2000 -- If SafeRewardRandom = false then this is the quantity rewarded, if true then can be ignored
 Config.SafeRewardMinQuantity = 2000 -- If SafeRewardRandom = true then this is the minimum quantity, otherwise can be ignored

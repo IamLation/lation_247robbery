@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'iamlation'
 description 'A standalone 24/7 robbery script for ESX & QBCore'
-version '1.1.3'
+version '1.1.4'
 
 client_scripts {
     'client/*.lua'
