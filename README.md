@@ -14,10 +14,14 @@ A fun & unique 24/7 robbery script for ESX & QBCore. Rob the registers, hack the
 - Configurable max attempts at hacking and/or unlocking the safe
 - Customizable computer hack minigame (skillcheck or questionnaire)
 - If using questionnaire hack, ability to fully customize each question & answer
+- If using mHacking, ability to fully customize the hack
 
 ## Dependencies
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
 - [ox_target](https://github.com/overextended/ox_target/releases), [qb-target](https://github.com/qbcore-framework/qb-target) or [qtarget](https://github.com/overextended/ox_target/releases)
+- [mHacking](https://github.com/AllRoundJonU/mHacking)
+### mHacking
+Due to the fact that the orginal mHacking is not longer available, I have link you a fork of mHacking that I have tested and works with this script. If you have the original mHacking, you can use that instead. Also the Version of mHacking included in QBCore works as well.
 
 ## Installation
 - Ensure you have all dependencies installed

@@ -33,7 +33,7 @@ Config.SafeRewardMaxQuantity = 10000 -- If SafeRewardRandom = true then this is 
 
 --[[ Computer Configs ]]
 Config.MaxHackAttempts = 3 -- The maximum amount of hack attempts to get the safe code before having to restart robbery
-Config.EnableQuestionnaire = true -- If true, the player will be asked a sequence of questions instead of the skillcheck below to hack the computer
+Config.ComputerHackType = 'skillcheck' -- If questionnaire the player will be asked a sequence of questions if mhacking the hack will open the mhacking interface if skillcheck if will use the skillcheck below to hack the computer
 Config.ComputerDifficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', 'easy', 'easy', 'easy', 'easy' } -- The skillcheck difficulty, can be 'easy', 'medium' or 'hard' in any order and any quantity (If EnableQuestionnaire is true, this can be ignored)
 Config.ComputerInput = { 'W', 'A', 'S', 'D' } -- The keys that are used for the skillcheck minigame, can be any keys (If EnableQuestionnaire is true, this can be ignored)
 
@@ -60,6 +60,11 @@ Config.Questions = { -- This is only used if Config.EnableQuestionnaire is true
             option4 = 'Print page'
         }
     },
+}
+
+Config.mHacking = {
+    time = 30, -- Time in seconds to complete the hack
+    solutionLength = 5, -- Length of the solution
 }
 
 Config.Answers = { -- This is only used if Config.EnableQuestionnaire is true
@@ -135,7 +140,8 @@ Notify = {
     wrongPin = 'You input the wrong pin and the safe remains locked',
     errorOccured = 'Something went wrong - please try again',
     tooManyHackFails = 'You\'ve failed to hack the computer too many times and failed robbing the store',
-    tooManySafeFails = 'You\'ve input the wrong PIN too many times and failed robbing the safe'
+    tooManySafeFails = 'You\'ve input the wrong PIN too many times and failed robbing the safe',
+    hackTypeMissing = 'The hack type is wrong or missing from the config file - please contact the server owner',
 }
 
 Target = {

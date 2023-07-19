@@ -265,7 +265,7 @@ function initiateComputerHack()
     if failedHack < Config.MaxHackAttempts then -- Checks hack attempts
         lib.requestAnimDict('anim@heists@prison_heiststation@cop_reactions', 100)
         TaskPlayAnim(cache.ped, 'anim@heists@prison_heiststation@cop_reactions', 'cop_b_idle', 8.0, 8.0, -1, 1, 1, 0, 0, 0)
-        if Config.EnableQuestionnaire then
+        if Config.ComputerHackType == 'questionnaire' then
             local questions = lib.inputDialog('Security Questions', {
                 {type = 'input', label = 'Question #1', description = Config.Questions.question1.question, required = true, icon = Config.Questions.question1.icon},
                 {type = 'input', label = 'Question #2', description = Config.Questions.question2.question, required = true, icon = Config.Questions.question2.icon},
@@ -279,57 +279,51 @@ function initiateComputerHack()
             })
             if string.lower(questions[1]) == string.lower(Config.Answers.question1Answer) and string.lower(questions[2]) == string.lower(Config.Answers.question2Answer) 
             and string.lower(questions[3]) == string.lower(Config.Answers.question3Answer) and string.lower(questions[4]) == tostring(Config.Answers.question4Answer) then 
-                failedHack = 0
-                ClearPedTasks(cache.ped)
-                generatedCode = math.random(1111, 9999)
-                safePin = generatedCode
-                lib.alertDialog({
-                    header = AlertDialog.computerHeader,
-                    content = AlertDialog.computerContent ..generatedCode,
-                    centered = true,
-                    cancel = false,
-                    labels = {
-                        confirm = AlertDialog.computerConfirmButton
-                    }
-                })
-                activeSafe = true
+                hackCallback(true, nil)
             else
-                ClearPedTasks(cache.ped)
-                activeComputer = true
-                failedHack = failedHack + 1
-                lib.notify({ id = 'failedHack', title = Notify.title, description = Notify.failedHack, icon = Notify.icon, type = 'error', position = Notify.position })
-                -- Add another dispatch notification here, if desired
+                hackCallback(false, nil)
             end
-        else
+        elseif Config.ComputerHackType == 'skillcheck' then
             local success = lib.skillCheck(Config.ComputerDifficulty, Config.ComputerInput)
-            if success then -- Player passes the hack
-                failedHack = 0
-                ClearPedTasks(cache.ped)
-                generatedCode = math.random(1111, 9999)
-                safePin = generatedCode
-                lib.alertDialog({
-                    header = AlertDialog.computerHeader,
-                    content = AlertDialog.computerContent ..generatedCode,
-                    centered = true,
-                    cancel = false,
-                    labels = {
-                        confirm = AlertDialog.computerConfirmButton
-                    }
-                })
-                activeSafe = true
-            else -- Player failed the hack
-                ClearPedTasks(cache.ped)
-                activeComputer = true
-                failedHack = failedHack + 1
-                lib.notify({ id = 'failedHack', title = Notify.title, description = Notify.failedHack, icon = Notify.icon, type = 'error', position = Notify.position })
-                -- Add another dispatch notification here, if desired
-            end
+            hackCallback(success, nil)
+        elseif Config.ComputerHackType == 'mhacking' then
+            TriggerEvent("mhacking:show")
+            TriggerEvent("mhacking:start", Config.mHacking.solutionLength, Config.mHacking.time, hackCallback)
+        else -- No correct hack type
+            lib.notify({ id = 'hackTypeMissing', title = Notify.title, description = Notify.hackTypeMissing, icon = Notify.icon, type = 'error', position = Notify.position })
         end
     else -- Player has failed the hack too many times, robbery ends/restarts
         activeRegister = false
         activeComputer = false
         failedHack = 0
         lib.notify({ id = 'tooManyHackFails', title = Notify.title, description = Notify.tooManyHackFails, icon = Notify.icon, type = 'error', position = Notify.position })
+    end
+end
+
+
+function hackCallback(success, timeremaining)
+    TriggerEvent('mhacking:hide')
+    if success then -- Player passes the hack
+        failedHack = 0
+        ClearPedTasks(cache.ped)
+        generatedCode = math.random(1111, 9999)
+        safePin = generatedCode
+        lib.alertDialog({
+            header = AlertDialog.computerHeader,
+            content = AlertDialog.computerContent ..generatedCode,
+            centered = true,
+            cancel = false,
+            labels = {
+                confirm = AlertDialog.computerConfirmButton
+            }
+        })
+        activeSafe = true
+    else -- Player failed the hack
+        ClearPedTasks(cache.ped)
+        activeComputer = true
+        failedHack = failedHack + 1
+        lib.notify({ id = 'failedHack', title = Notify.title, description = Notify.failedHack, icon = Notify.icon, type = 'error', position = Notify.position })
+        -- Add another dispatch notification here, if desired
     end
 end
 
