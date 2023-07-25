@@ -10,6 +10,7 @@
         "checkConditions",
         "policeCount",
         "QBCore",
-        "QBShared"
+        "QBShared",
+        "initiateRegisterRobbery"
     ]
 }

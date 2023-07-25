@@ -277,6 +277,11 @@ function initiateComputerHack()
                     { value = '4', label = Config.Questions.question4.options.option4 }
                 }, required = true, icon = Config.Questions.question4.icon}
             })
+            if not questions then
+                activeComputer = true
+                ClearPedTasks(cache.ped)
+                return
+            end
             if string.lower(questions[1]) == string.lower(Config.Answers.question1Answer) and string.lower(questions[2]) == string.lower(Config.Answers.question2Answer) 
             and string.lower(questions[3]) == string.lower(Config.Answers.question3Answer) and string.lower(questions[4]) == tostring(Config.Answers.question4Answer) then 
                 failedHack = 0
