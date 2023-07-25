@@ -22,6 +22,10 @@ function checkConditions()
             conditionsMet = true
             initiateRegisterRobbery()
         end
+    else
+        conditionsMet = false
+        activeRegister = false
+        ShowNotification(Notify.missingItem, 'error')
     end
 end
 
