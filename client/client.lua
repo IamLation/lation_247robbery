@@ -1,22 +1,8 @@
 local qtarget = exports.qtarget
-local ox_inventory = exports.ox_inventory
-local activeRegister = false
-local activeComputer = false
-local activeSafe = false
-local conditionsMet = false
-local generatedCode = nil
-local safePin = nil
-local wrongPIN = 0
-local failedHack = 0
-local verifyReward = false
-
-if Config.Framework == 'esx' then
-    ESX = exports["es_extended"]:getSharedObject()
-elseif Config.Framework == 'qbcore' then
-    QBCore = exports['qb-core']:GetCoreObject()
-else
-    -- Custom framework
-end
+local activeRegister, activeComputer, activeSafe = false, false, false
+local conditionsMet, verifyReward = false, false
+local generatedCode, safePin = nil, nil
+local wrongPIN, failedHack = 0, 0
 
 -- Creates all the targets for the registers noted in the Config
 for k, v in pairs(Config.Locations.Registers) do
@@ -99,72 +85,21 @@ end
 
 -- Function that checks that all conditions have been met before proceeding
 function checkConditions()
-    if Config.Framework == 'esx' then
-        local hasItem = ESX.SearchInventory(Config.RegisterRobberyItem, 1)
-        if hasItem >= 1 then
-            if Config.RequirePolice then
-                local policeCount = lib.callback.await('lation_247robbery:policeCount', false)
-                if policeCount >= Config.PoliceCount then
-                    conditionsMet = true
-                    initiateRegisterRobbery()
-                else
-                    conditionsMet = false
-                    activeRegister = false
-                    lib.notify({ id = 'policeMissing', title = Notify.title, description = Notify.notEnoughPolice, icon = Notify.icon, type = 'error', position = Notify.position })
-                end
-            else
+    local hasItem = HasItem(Config.RegisterRobberyItem, 1)
+    if hasItem then
+        if Config.RequirePolice then
+            local policeCount = lib.callback.await('lation_247robbery:getPoliceCount', false)
+            if policeCount >= Config.PoliceCount then
                 conditionsMet = true
                 initiateRegisterRobbery()
-            end
-        else
-            conditionsMet = false
-            activeRegister = false
-            lib.notify({ id = 'itemMissing', title = Notify.title, description = Notify.missingItem, icon = Notify.icon, type = 'error', position = Notify.position })
-        end
-    elseif Config.Framework == 'qbcore' then
-        local hasItem = QBCore.Functions.HasItem(Config.RegisterRobberyItem)
-        if hasItem then
-            if Config.RequirePolice then
-                local policeCount = lib.callback.await('lation_247robbery:policeCount', false)
-                if policeCount >= Config.PoliceCount then
-                    conditionsMet = true
-                    initiateRegisterRobbery()
-                else
-                    conditionsMet = false
-                    activeRegister = false
-                    lib.notify({ id = 'policeMissing', title = Notify.title, description = Notify.notEnoughPolice, icon = Notify.icon, type = 'error', position = Notify.position })
-                end
             else
-                conditionsMet = true
-                initiateRegisterRobbery()
+                conditionsMet = false
+                activeRegister = false
+                ShowNotification(Notify.notEnoughPolice, 'error')
             end
         else
-            conditionsMet = false
-            activeRegister = false
-            lib.notify({ id = 'itemMissing', title = Notify.title, description = Notify.missingItem, icon = Notify.icon, type = 'error', position = Notify.position })
-        end
-    else
-        -- Custom framework/standalone
-        local hasItem = ox_inventory:Search('count', Config.RegisterRobberyItem)
-        if hasItem >= 1 then
-            if Config.RequirePolice then
-                local policeCount = lib.callback.await('lation_247robbery:policeCount', false)
-                if policeCount >= Config.PoliceCount then
-                    conditionsMet = true
-                    initiateRegisterRobbery()
-                else
-                    conditionsMet = false
-                    activeRegister = false
-                    lib.notify({ id = 'policeMissing', title = Notify.title, description = Notify.notEnoughPolice, icon = Notify.icon, type = 'error', position = Notify.position })
-                end
-            else
-                conditionsMet = true
-                initiateRegisterRobbery()
-            end
-        else
-            conditionsMet = false
-            activeRegister = false
-            lib.notify({ id = 'itemMissing', title = Notify.title, description = Notify.missingItem, icon = Notify.icon, type = 'error', position = Notify.position })
+            conditionsMet = true
+            initiateRegisterRobbery()
         end
     end
 end
@@ -238,20 +173,20 @@ function initiateRegisterRobbery()
                     -- Player is not rewarded
                     -- Cooldown is not activated
                     activeRegister = false
-                    lib.notify({ id = 'robberyCancel', title = Notify.title, description = Notify.robberyCancel, icon = Notify.icon, type = 'error', position = Notify.position })
+                    ShowNotification(Notify.robberyCancel, 'error')
                 end
             else
                 -- Player failed to successfully lockpick the register, so a chance at breaking happens below
                 local lockpickBreakChance = math.random(1, 100)
                 if lockpickBreakChance <= Config.LockpickBreakChance then
-                    lib.callback('lation_247robbery:removeItem', false, source, Config.RegisterRobberyItem, 1)
-                    lib.notify({ id = 'lockpickBroke', title = Notify.title, description = Notify.lockpickBroke, icon = Notify.icon, type = 'error', position = Notify.position })
+                    TriggerServerEvent('lation_247robbery:removeItem', cache.serverId, Config.RegisterRobberyItem, 1)
+                    ShowNotification(Notify.lockpickBroke, 'error')
                 end
                 activeRegister = false
             end
         else
             -- A cooldown is currently active, so the robbery will not proceed
-            lib.notify({ id = 'registerCooldown', title = Notify.title, description = Notify.registerCooldown, icon = Notify.icon, type = 'error', position = Notify.position })
+            ShowNotification(Notify.registerCooldown, 'error')
             activeRegister = false
         end
     else
@@ -266,11 +201,11 @@ function initiateComputerHack()
         lib.requestAnimDict('anim@heists@prison_heiststation@cop_reactions', 100)
         TaskPlayAnim(cache.ped, 'anim@heists@prison_heiststation@cop_reactions', 'cop_b_idle', 8.0, 8.0, -1, 1, 1, 0, 0, 0)
         if Config.EnableQuestionnaire then
-            local questions = lib.inputDialog('Security Questions', {
-                {type = 'input', label = 'Question #1', description = Config.Questions.question1.question, required = true, icon = Config.Questions.question1.icon},
-                {type = 'input', label = 'Question #2', description = Config.Questions.question2.question, required = true, icon = Config.Questions.question2.icon},
-                {type = 'input', label = 'Question #3', description = Config.Questions.question3.question, required = true, icon = Config.Questions.question3.icon},
-                {type = 'select', label = 'Question #4', description = Config.Questions.question4.question, options = {
+            local questions = lib.inputDialog(InputDialog.questionsHeader, {
+                {type = 'input', label = InputDialog.questionOne, description = Config.Questions.question1.question, required = true, icon = Config.Questions.question1.icon},
+                {type = 'input', label = InputDialog.questionTwo, description = Config.Questions.question2.question, required = true, icon = Config.Questions.question2.icon},
+                {type = 'input', label = InputDialog.questionThree, description = Config.Questions.question3.question, required = true, icon = Config.Questions.question3.icon},
+                {type = 'select', label = InputDialog.questionFour, description = Config.Questions.question4.question, options = {
                     { value = '1', label = Config.Questions.question4.options.option1 },
                     { value = '2', label = Config.Questions.question4.options.option2 },
                     { value = '3', label = Config.Questions.question4.options.option3 },
@@ -302,7 +237,7 @@ function initiateComputerHack()
                 ClearPedTasks(cache.ped)
                 activeComputer = true
                 failedHack = failedHack + 1
-                lib.notify({ id = 'failedHack', title = Notify.title, description = Notify.failedHack, icon = Notify.icon, type = 'error', position = Notify.position })
+                ShowNotification(Notify.failedHack, 'error')
                 -- Add another dispatch notification here, if desired
             end
         else
@@ -326,7 +261,7 @@ function initiateComputerHack()
                 ClearPedTasks(cache.ped)
                 activeComputer = true
                 failedHack = failedHack + 1
-                lib.notify({ id = 'failedHack', title = Notify.title, description = Notify.failedHack, icon = Notify.icon, type = 'error', position = Notify.position })
+                ShowNotification(Notify.failedHack, 'error')
                 -- Add another dispatch notification here, if desired
             end
         end
@@ -334,7 +269,7 @@ function initiateComputerHack()
         activeRegister = false
         activeComputer = false
         failedHack = 0
-        lib.notify({ id = 'tooManyHackFails', title = Notify.title, description = Notify.tooManyHackFails, icon = Notify.icon, type = 'error', position = Notify.position })
+        ShowNotification(Notify.tooManyHackFails, 'error')
     end
 end
 
@@ -342,14 +277,18 @@ end
 function initiateSafeRobbery()
     activeSafe = false -- Deactivates target option 
     if wrongPIN < Config.MaxCodeAttempts then -- Checks PIN attempts
-        local inputCode = lib.inputDialog('Store Safe', {
-            {type = 'input', label = 'Enter PIN', description = 'Input the PIN to unlock the safe', placeholder = '6969', icon = 'lock', required = true, min = 4, max = 16},
+        local inputCode = lib.inputDialog(InputDialog.safeHeader, {
+            {type = 'input', label = InputDialog.safeLabel, description = InputDialog.safeDescription, placeholder = InputDialog.safePlaceholder, icon = InputDialog.safeIcon, required = true, min = 4, max = 16},
         })
+        if not inputCode then
+            activeSafe = true
+            return
+        end
         local convertedCode = tonumber(inputCode[1])
         if convertedCode ~= safePin then -- Wrong PIN
             wrongPIN = wrongPIN + 1
             activeSafe = true
-            lib.notify({ id = 'wrongPIN', title = Notify.title, description = Notify.wrongPin, icon = Notify.icon, type = 'error', position = Notify.position })
+            ShowNotification(Notify.wrongPin, 'error')
             -- Add another dispatch notification here, if desired for player inputting wrong PIN on safe
         elseif convertedCode == safePin then -- Correct PIN
             activeSafe = false
@@ -366,8 +305,8 @@ function initiateSafeRobbery()
                 activeRegister = false
                 verifyReward = true
                 local reward = lib.callback.await('lation_247robbery:safeSuccessful', false, verifyReward)
-                if reward then 
-                    verifyReward = false 
+                if reward then
+                    verifyReward = false
                 else
                     -- Kick/drop player? Potential cheating?
                     verifyReward = false
@@ -377,12 +316,12 @@ function initiateSafeRobbery()
                 -- notify of cancel
             end
         else -- Something went wrong
-            lib.notify({ id = 'wrongPIN', title = Notify.title, description = Notify.errorOccured, icon = Notify.icon, type = 'error', position = Notify.position })
+            ShowNotification(Notify.errorOccured, 'error')
         end
     else -- Player has input a wrong PIN too many times, robbery ends/restarts
         activeRegister = false
         activeSafe = false
         wrongPIN = 0
-        lib.notify({ id = 'tooManyFails', title = Notify.title, description = Notify.tooManySafeFails, icon = Notify.icon, type = 'error', position = Notify.position })
+        ShowNotification(Notify.tooManySafeFails, 'error')
     end
 end

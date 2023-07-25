@@ -1,16 +1,18 @@
 fx_version 'cerulean'
-games {'gta5'}
+game 'gta5'
 lua54 'yes'
 
 author 'iamlation'
-description 'A standalone 24/7 robbery script for ESX & QBCore'
+description 'A 24/7 robbery script for FiveM'
 version '1.1.4'
 
 client_scripts {
+    'bridge/client.lua',
     'client/*.lua'
 }
 
 server_scripts {
+    'bridge/server.lua',
     'server/*.lua'
 }
 

@@ -1,13 +1,11 @@
 Config = {}
 
-Config.Framework = 'esx' -- 'esx', 'qbcore' or 'standalone' (standalone option uses ox_inventory exports)
-
---[[ General Configs ]]
+-- General configs
 Config.RequirePolice = true -- Set to true if you want to require police in order to rob stores (requires Config.Framework be set to 'esx' or 'qbcore' if true)
 Config.PoliceCount = 0  -- If RequirePolice is true, how many must be online to rob stores?
 Config.PoliceJobs = { 'police', 'sheriff' } -- Add your police job names here
 
---[[ Register Configs ]]
+-- Register configs
 Config.RegisterRobberyItem = 'advanced_lockpick' -- The item name required to rob a cash register
 Config.RegisterMinCooldown = 10 -- The minimum cooldown time for robbing registers once one has been robbed
 Config.RegisterMaxCooldown = 20 -- The maximum cooldown time for robbing registers once one has been robbed
@@ -21,7 +19,7 @@ Config.RegisterRewardMaxQuantity = 5000 -- If RegisterRewardRandom = true then t
 Config.LockpickBreakChance = 50 -- The percentage chance the lockpick breaks when failing to lockpick a register
 Config.CodeChance = 10 -- The percentage chance a player receives a code from the register to skip the PC hack requirement
 
---[[ Safe Configs ]]
+-- Safe configs
 Config.SafeMinCooldown = 10 -- The minimum cooldown time for robbing safes once one has been robbed
 Config.SafeMaxCooldown = 20 -- The maximum cooldown time for robbing safes once one has been robbed
 Config.MaxCodeAttempts = 3 -- The maximum amount of attempts to input the correct code to unlock safe before having to restart robbery
@@ -31,12 +29,13 @@ Config.SafeRewardQuantity = 2000 -- If SafeRewardRandom = false then this is the
 Config.SafeRewardMinQuantity = 2000 -- If SafeRewardRandom = true then this is the minimum quantity, otherwise can be ignored
 Config.SafeRewardMaxQuantity = 10000 -- If SafeRewardRandom = true then this is the maximum quantity, otherwise can be ignored
 
---[[ Computer Configs ]]
+-- Computer configs
 Config.MaxHackAttempts = 3 -- The maximum amount of hack attempts to get the safe code before having to restart robbery
 Config.EnableQuestionnaire = true -- If true, the player will be asked a sequence of questions instead of the skillcheck below to hack the computer
 Config.ComputerDifficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', 'easy', 'easy', 'easy', 'easy' } -- The skillcheck difficulty, can be 'easy', 'medium' or 'hard' in any order and any quantity (If EnableQuestionnaire is true, this can be ignored)
 Config.ComputerInput = { 'W', 'A', 'S', 'D' } -- The keys that are used for the skillcheck minigame, can be any keys (If EnableQuestionnaire is true, this can be ignored)
 
+-- Questionnaire configs
 Config.Questions = { -- This is only used if Config.EnableQuestionnaire is true
     question1 = {
         question = 'What is a PSU?',
@@ -69,7 +68,7 @@ Config.Answers = { -- This is only used if Config.EnableQuestionnaire is true
     question4Answer = 3 -- Just the option number of the correct answer from above (option1 = 1, option2 = 2, etc)
 }
 
---[[ Store Location Configs ]]
+-- Store configs
 Config.Locations = {
     Registers = {
         vec3(24.94561958313, -1344.9544677734, 29.611698150635), -- Innocence Blvd
@@ -121,7 +120,7 @@ Config.Locations = {
     }
 }
 
---[[ String Configs ]]
+-- String configs
 Notify = {
     title = 'Convenience Store', -- The title for all notifications
     icon = 'store', -- The icon for all notifications
@@ -164,4 +163,17 @@ AlertDialog = {
     computerHeader = 'Code Exposed',
     computerContent = 'You successfully hacked the computer and find the following code: ',
     computerConfirmButton = 'Got it'
+}
+
+InputDialog = {
+    questionsHeader = 'Security Questions',
+    questionOne = 'Question #1',
+    questionTwo = 'Question #2',
+    questionThree = 'Question #3',
+    questionFour = 'Question #4',
+    safeHeader = 'Store Safe',
+    safeLabel = 'Enter PIN',
+    safeDescription = 'Input the PIN to unlock the safe',
+    safePlaceholder = '6969',
+    safeIcon = 'lock'
 }
