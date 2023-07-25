@@ -4,85 +4,6 @@ local conditionsMet, verifyReward = false, false
 local generatedCode, safePin = nil, nil
 local wrongPIN, failedHack = 0, 0
 
--- Creates all the targets for the registers noted in the Config
-for k, v in pairs(Config.Locations.Registers) do
-    qtarget:AddCircleZone('cash_register' ..k, v, 0.35, {
-        name = 'cash_register' ..k,
-        debugPoly = Target.debugTargets,
-    }, {
-        options = {
-            {
-                icon = Target.registerIcon,
-                label = Target.registerLabel,
-                canInteract = function()
-                    if activeRegister then
-                        return false
-                    else
-                        return true
-                    end
-                end,
-                action = function()
-                    activeRegister = true
-                    checkConditions()
-                end
-            }
-        },
-        distance = 2,
-    })
-end
-
--- Creates all the targets for the computers noted in the Config
-for k, v in pairs(Config.Locations.Computers) do
-    qtarget:AddCircleZone('computer' ..k, v, 0.35, {
-        name = 'computer' ..k,
-        debugPoly = Target.debugTargets,
-    }, {
-        options = {
-            {
-                icon = Target.computerIcon,
-                label = Target.computerLabel,
-                canInteract = function()
-                    if activeComputer then
-                        return true
-                    else
-                        return false
-                    end
-                end,
-                action = function()
-                    initiateComputerHack()
-                end
-            }
-        },
-        distance = 2,
-    })
-end
-
--- Creates all the targets for the safes noted in the Config
-for k, v in pairs(Config.Locations.Safes) do
-    qtarget:AddCircleZone('safe' ..k, v, 0.45, {
-        name = 'safe' ..k,
-        debugPoly = Target.debugTargets,
-    }, {
-        options = {
-            {
-                icon = Target.safeIcon,
-                label = Target.safeLabel,
-                canInteract = function()
-                    if activeSafe then
-                        return true
-                    else
-                        return false
-                    end
-                end,
-                action = function()
-                    initiateSafeRobbery()
-                end
-            }
-        },
-        distance = 2,
-    })
-end
-
 -- Function that checks that all conditions have been met before proceeding
 function checkConditions()
     local hasItem = HasItem(Config.RegisterRobberyItem, 1)
@@ -324,4 +245,83 @@ function initiateSafeRobbery()
         wrongPIN = 0
         ShowNotification(Notify.tooManySafeFails, 'error')
     end
+end
+
+-- Creates all the targets for the registers noted in the Config
+for k, v in pairs(Config.Locations.Registers) do
+    qtarget:AddCircleZone('cash_register' ..k, v, 0.35, {
+        name = 'cash_register' ..k,
+        debugPoly = Target.debugTargets,
+    }, {
+        options = {
+            {
+                icon = Target.registerIcon,
+                label = Target.registerLabel,
+                canInteract = function()
+                    if activeRegister then
+                        return false
+                    else
+                        return true
+                    end
+                end,
+                action = function()
+                    activeRegister = true
+                    checkConditions()
+                end
+            }
+        },
+        distance = 2,
+    })
+end
+
+-- Creates all the targets for the computers noted in the Config
+for k, v in pairs(Config.Locations.Computers) do
+    qtarget:AddCircleZone('computer' ..k, v, 0.35, {
+        name = 'computer' ..k,
+        debugPoly = Target.debugTargets,
+    }, {
+        options = {
+            {
+                icon = Target.computerIcon,
+                label = Target.computerLabel,
+                canInteract = function()
+                    if activeComputer then
+                        return true
+                    else
+                        return false
+                    end
+                end,
+                action = function()
+                    initiateComputerHack()
+                end
+            }
+        },
+        distance = 2,
+    })
+end
+
+-- Creates all the targets for the safes noted in the Config
+for k, v in pairs(Config.Locations.Safes) do
+    qtarget:AddCircleZone('safe' ..k, v, 0.45, {
+        name = 'safe' ..k,
+        debugPoly = Target.debugTargets,
+    }, {
+        options = {
+            {
+                icon = Target.safeIcon,
+                label = Target.safeLabel,
+                canInteract = function()
+                    if activeSafe then
+                        return true
+                    else
+                        return false
+                    end
+                end,
+                action = function()
+                    initiateSafeRobbery()
+                end
+            }
+        },
+        distance = 2,
+    })
 end
