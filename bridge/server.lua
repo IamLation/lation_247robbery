@@ -58,7 +58,7 @@ AddItem = function(source, item, count, slot, metadata)
         if Framework == 'esx' then
             return player.addInventoryItem(item, count, metadata, slot)
         elseif Framework == 'qb' then
-            player.Functions.AddItem(item, count, slot, metadata)
+            player.Functions.AddItem(item, 1, false, count)
             TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], 'add')
         else
             -- Add support for a custom framework here
