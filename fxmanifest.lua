@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'iamlation'
 description 'A 24/7 robbery script for FiveM'
-version '1.1.4'
+version '1.1.5'
 
 client_scripts {
     'bridge/client.lua',
