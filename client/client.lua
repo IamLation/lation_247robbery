@@ -120,7 +120,7 @@ function initiateComputerHack()
     activeComputer = false -- Deactivates target option
     if failedHack < Config.MaxHackAttempts then -- Checks hack attempts
         lib.requestAnimDict('anim@heists@prison_heiststation@cop_reactions', 100)
-        TaskPlayAnim(cache.ped, 'anim@heists@prison_heiststation@cop_reactions', 'cop_b_idle', 8.0, 8.0, -1, 1, 1, 0, 0, 0)
+        TaskPlayAnim(cache.ped, 'anim@heists@prison_heiststation@cop_reactions', 'cop_b_idle', 8.0, 8.0, -1, 1, 1, false, false, false)
         if Config.EnableQuestionnaire then
             local questions = lib.inputDialog(InputDialog.questionsHeader, {
                 {type = 'input', label = InputDialog.questionOne, description = Config.Questions.question1.question, required = true, icon = Config.Questions.question1.icon},
