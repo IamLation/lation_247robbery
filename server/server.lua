@@ -32,7 +32,12 @@ lib.callback.register('lation_247robbery:registerSuccessful', function(source, v
     if verifyReward == true then
         if distanceCheck then
             if Framework == 'qb' then
-                local reward = {worth = rewardQuantity}
+                local reward
+                if Config.RegisterRewardItem == 'markedbills' then
+                    reward = {worth = rewardQuantity}
+                else
+                    reward = rewardQuantity
+                end
                 AddItem(source, Config.RegisterRewardItem, reward)
                 TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[Config.RegisterRewardItem], "add")
             else
@@ -68,7 +73,12 @@ lib.callback.register('lation_247robbery:safeSuccessful', function(source, verif
     if verifyReward then
         if distanceCheck then
             if Framework == 'qb' then
-                local reward = {worth = rewardQuantity}
+                local reward
+                if Config.SafeRewardItem == 'markedbills' then
+                    reward = {worth = rewardQuantity}
+                else
+                    reward = rewardQuantity
+                end
                 AddItem(source, Config.SafeRewardItem, reward)
                 TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[Config.SafeRewardItem], "add")
             else
