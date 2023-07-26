@@ -23,20 +23,6 @@ GetPlayer = function(source)
     end
 end
 
--- Function to get a players identifier
-GetPlayerIdentifier = function(source)
-    local player = GetPlayer(source)
-    if player then
-        if Framework == 'esx' then
-            return player.identifier
-        elseif Framework == 'qb' then
-            return player.PlayerData.citizenid
-        else
-            -- Add support for a custom framework here
-        end
-    end
-end
-
 -- Function to get a players name
 GetName = function(source)
     local player = GetPlayer(source)
@@ -77,33 +63,6 @@ RemoveItem = function(source, item, count, slot, metadata)
         elseif Framework == 'qb' then
             player.Functions.RemoveItem(item, count, slot, metadata)
             TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "remove")
-        else
-            -- Add support for a custom framework here
-        end
-    end
-end
-
--- Function to convert moneyType to match framework
-ConvertMoneyType = function(moneyType)
-    if moneyType == 'money' and Framework == 'qb' then
-        moneyType = 'cash'
-    elseif moneyType == 'cash' and Framework == 'esx' then
-        moneyType = 'money'
-    else
-        -- Add support for a custom framework here
-    end
-    return moneyType
-end
-
--- Function to add money to a players account
-AddMoney = function(source, moneyType, amount)
-    local player = GetPlayer(source)
-    moneyType = ConvertMoneyType(moneyType)
-    if player then
-        if Framework == 'esx' then
-            player.addAccountMoney(moneyType, amount)
-        elseif Framework == 'qb' then
-            player.Functions.AddMoney(moneyType, amount)
         else
             -- Add support for a custom framework here
         end
