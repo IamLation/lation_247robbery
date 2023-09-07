@@ -4,6 +4,7 @@ Config = {}
 Config.RequirePolice = true -- Set to true if you want to require police in order to rob stores (requires Config.Framework be set to 'esx' or 'qbcore' if true)
 Config.PoliceCount = 0  -- If RequirePolice is true, how many must be online to rob stores?
 Config.PoliceJobs = { 'police', 'sheriff' } -- Add your police job names here
+Config.Dispatch = 'cd_dispatch' -- Available options: 'cd_dispatch', 'linden_outlawalert', 'ps-dispatch', 'qs-dispatch' and 'custom'
 
 -- Register configs
 Config.RegisterRobberyItem = 'advanced_lockpick' -- The item name required to rob a cash register
