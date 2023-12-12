@@ -7,6 +7,7 @@ A fun & unique 24/7 robbery script for ESX & QBCore. Rob the registers, hack the
 
 ## Features
 - Supports ESX & QBCore
+- Discord webhook logging
 - Highly detailed config file
 - Preconfigured for default 24/7 (if you use Gabz, those coords are available too)
 - Customize payouts to player
@@ -21,7 +22,7 @@ A fun & unique 24/7 robbery script for ESX & QBCore. Rob the registers, hack the
 - [ox_target](https://github.com/overextended/ox_target/releases), [qb-target](https://github.com/qbcore-framework/qb-target) or [qtarget](https://github.com/overextended/ox_target/releases)
 
 ## Installation
-- Ensure you have all dependencies installed
+- Ensure you have all dependencies above installed
 - Add lation_247robbery to your 'resources' directory
 - Add 'ensure lation_247robbery' in your 'server.cgf'
 
