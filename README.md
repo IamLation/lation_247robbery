@@ -8,7 +8,7 @@ A fun & unique 24/7 robbery script for ESX & QBCore. Rob the registers, hack the
 ## Features
 - Supports ESX & QBCore
 - Highly detailed config file
-- Preconfigured for default 24/7 (if you use Gabz, the coords are in the gabz247coords.lua file)
+- Preconfigured for default 24/7 (if you use Gabz, those coords are available too)
 - Customize payouts to player
 - Enable/disable requiring a police presence in the city
 - Configurable individual cooldowns for registers & safes
@@ -25,5 +25,5 @@ A fun & unique 24/7 robbery script for ESX & QBCore. Rob the registers, hack the
 - Add lation_247robbery to your 'resources' directory
 - Add 'ensure lation_247robbery' in your 'server.cgf'
 
-## Preview
+## Preview (Outdated)
 [Streamable - Lation's 24/7 Robbery](https://streamable.com/xaaave)

@@ -1,8 +1,60 @@
 GlobalState.registerCooldown = false
 GlobalState.safeCooldown = false
 
+-- Function used to make numbers prettier (Credits to ESX for the function)
+--- @param value number
+local GroupDigits = function(value)
+	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
+	return left .. (num:reverse():gsub('(%d%d%d)', '%1,'):reverse()) .. right
+end
+
+-- Function to manage register cooldown
+local RegisterCooldown = function()
+    SetTimeout(2000, function()
+        GlobalState.registerCooldown = true
+        local cooldown = math.random(Config.RegisterMinCooldown * 60000, Config.RegisterMaxCooldown * 60000)
+        local format = cooldown / 1000 / 60
+        local cooldownRound = math.floor(format)
+        DiscordLogs(
+            Strings.Logs.titles.cooldownA,
+            Strings.Logs.messages.cooldownRA ..cooldownRound .. ' ' ..Strings.Logs.messages.minutes,
+            Strings.Logs.colors.red
+        )
+        Wait(cooldown)
+        DiscordLogs(
+            Strings.Logs.titles.cooldownI,
+            Strings.Logs.messages.cooldownRI,
+            Strings.Logs.colors.green
+        )
+        GlobalState.registerCooldown = false
+    end)
+end
+
+-- Function to manage safe cooldown
+local SafeCooldown = function()
+    SetTimeout(2000, function()
+        GlobalState.safeCooldown = true
+        local cooldown = math.random(Config.SafeMinCooldown * 60000, Config.SafeMaxCooldown * 60000)
+        local format = cooldown / 1000 / 60
+        local cooldownRound = math.floor(format)
+        DiscordLogs(
+            Strings.Logs.titles.cooldownA,
+            Strings.Logs.messages.cooldownSA ..cooldownRound .. ' ' ..Strings.Logs.messages.minutes,
+            Strings.Logs.colors.red
+        )
+        Wait(cooldown)
+        DiscordLogs(
+            Strings.Logs.titles.cooldownI,
+            Strings.Logs.messages.cooldownSI,
+            Strings.Logs.colors.green
+        )
+        GlobalState.safeCooldown = false
+    end)
+end
+
 -- Function to check the players distance to registers/safes/etc
-local function checkPlayerDistance(source)
+--- @param source number
+local CheckPlayerDistance = function(source)
     local ped = GetPlayerPed(source)
     local playerPos = GetEntityCoords(ped)
     for _, locations in pairs(Config.Locations) do
@@ -16,96 +68,57 @@ local function checkPlayerDistance(source)
     return false
 end
 
--- Function that rewards the player upon a successful register robbery
-lib.callback.register('lation_247robbery:registerSuccessful', function(source, verifyReward)
+RegisterNetEvent('lation_247robbery:RewardRobbery', function(source, type)
     local source = source
     local player = GetPlayer(source)
+    if not player then return end
     local playerName = GetName(source)
-    local playerId = player.source or player.PlayerData.source
-    local distanceCheck = checkPlayerDistance(source)
-    local rewardQuantity = nil
-    if Config.RegisterRewardRandom then
-        rewardQuantity = math.random(Config.RegisterRewardMinQuantity, Config.RegisterRewardMaxQuantity)
-    else
-        rewardQuantity = Config.RegisterRewardQuantity
-    end
-    if verifyReward == true then
-        if distanceCheck then
-            if Framework == 'qb' then
-                local reward
-                if Config.RegisterRewardItem == 'markedbills' then
-                    reward = {worth = rewardQuantity}
-                else
-                    reward = rewardQuantity
-                end
-                AddItem(source, Config.RegisterRewardItem, reward)
-                TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[Config.RegisterRewardItem], "add")
-            else
-                AddItem(source, Config.RegisterRewardItem, rewardQuantity)
+    local identifier = GetIdentifier(source)
+    local distance = CheckPlayerDistance(source)
+    local item, quantity, value
+    if distance then
+        if type == 'register' then
+            item = Config.RegisterRewardItem
+            quantity = Config.RegisterRewardQuantity
+            if Config.RegisterRewardRandom then
+                quantity = math.random(Config.RegisterRewardMinQuantity, Config.RegisterRewardMaxQuantity)
             end
-            registerCooldown()
-            return true
+            value = quantity
+            RegisterCooldown()
         else
-            -- Potential cheating?
-            print('Player: ' ..playerName.. ' (ID: '..playerId..') has attempted to get rewarded for a register robbery despite not being within range of any 24/7.')
-            return false
-        end
-    else
-        -- Potential cheating if verifyReward is false?
-        print('Player: ' ..playerName.. ' (ID: '..source..') has attempted to get rewarded for a register robbery despite verifyReward not being true')
-        return false
-    end
-end)
-
--- Function that rewards the player upon a successful safe robbery
-lib.callback.register('lation_247robbery:safeSuccessful', function(source, verifyReward)
-    local source = source
-    local player = GetPlayer(source)
-    local playerName = GetName(source)
-    local playerId = player.source or player.PlayerData.source
-    local distanceCheck = checkPlayerDistance(source)
-    local rewardQuantity = nil
-    if Config.SafeRewardRandom then
-        rewardQuantity = math.random(Config.SafeRewardMinQuantity, Config.SafeRewardMaxQuantity)
-    else
-        rewardQuantity = Config.SafeRewardQuantity
-    end
-    if verifyReward then
-        if distanceCheck then
-            if Framework == 'qb' then
-                local reward
-                if Config.SafeRewardItem == 'markedbills' then
-                    reward = {worth = rewardQuantity}
-                else
-                    reward = rewardQuantity
-                end
-                AddItem(source, Config.SafeRewardItem, reward)
-                TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[Config.SafeRewardItem], "add")
-            else
-                AddItem(source, Config.SafeRewardItem, rewardQuantity)
+            item = Config.SafeRewardItem
+            quantity = Config.SafeRewardQuantity
+            if Config.SafeRewardRandom then
+                quantity = math.random(Config.SafeRewardMinQuantity, Config.SafeRewardMaxQuantity)
             end
-            safeCooldown()
-            return true
-        else
-            -- Potential cheating?
-            print('Player: ' ..playerName.. ' (ID: '..playerId..') has attempted to get rewarded for a safe robbery despite not being within range of any 24/7.')
-            return false
+            value = quantity
+            SafeCooldown()
         end
-    else
-        -- Potential cheating if verifyReward is false?
-        print('Player: ' ..playerName.. ' (ID: '..playerId..') has attempted to get rewarded for a safe robbery despite verifyReward not being true')
-        return false
+        if Framework == 'qb' then
+            if Config.Metadata then
+                quantity = {worth = quantity}
+                value = quantity.worth
+            end
+        end
+        AddItem(source, item, quantity)
+        if Config.EnableLogs then
+            local robType = type:gsub("^%l", string.upper) -- Capitalizing string for logs
+            DiscordLogs(
+                '💰 ' ..robType.. ' ' ..Strings.Logs.titles.robbery,
+                Strings.Logs.labels.name ..playerName..
+                Strings.Logs.labels.id ..tostring(source)..
+                Strings.Logs.labels.identifier ..tostring(identifier)..
+                Strings.Logs.labels.message ..Strings.Logs.messages.robbery.. '$' ..GroupDigits(value).. ' ' ..item,
+                Strings.Logs.colors.green
+            )
+        end
     end
 end)
 
 -- Function that gets the passed item & quantity and removes it
-RegisterNetEvent('lation_247robbery:removeItem')
-AddEventHandler('lation_247robbery:removeItem', function(source, item, quantity)
+RegisterNetEvent('lation_247robbery:RemoveItem', function(source, item, quantity)
     local source = source
     RemoveItem(source, item, quantity)
-    if Framework == 'qb' then
-        TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "remove")
-    end
 end)
 
 -- Callback used to get police count
@@ -113,27 +126,3 @@ lib.callback.register('lation_247robbery:getPoliceCount', function()
     local policeCount = PlayersWithJob(Config.PoliceJobs)
     return policeCount
 end)
-
--- Function that handles the register cooldowns
-function registerCooldown()
-    GlobalState.registerCooldown = true
-    local cooldown = math.random(Config.RegisterMinCooldown * 60000, Config.RegisterMaxCooldown * 60000)
-    local format = cooldown / 1000 / 60
-    local cooldownRound = math.floor(format)
-    print('24/7 register robbery cooldown now active for ' .. cooldownRound .. ' minutes')
-    Wait(cooldown)
-    print('24/7 register robbery cooldown now inactive')
-    GlobalState.registerCooldown = false
-end
-
--- Function that handles the safe cooldowns
-function safeCooldown()
-    GlobalState.safeCooldown = true
-    local cooldown = math.random(Config.SafeMinCooldown * 60000, Config.SafeMaxCooldown * 60000)
-    local format = cooldown / 1000 / 60
-    local cooldownRound = math.floor(format)
-    print('24/7 safe robbery cooldown now active for ' .. cooldownRound .. ' minutes')
-    Wait(cooldown)
-    print('24/7 safe robbery cooldown now inactive')
-    GlobalState.safeCooldown = false
-end

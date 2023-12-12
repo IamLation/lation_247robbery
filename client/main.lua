@@ -1,211 +1,187 @@
-local qtarget = exports.qtarget
+-- Initialize variables
+local progressType = Config.ProgressType == 'bar' and 'progressBar' or 'progressCircle'
 local activeRegister, activeComputer, activeSafe = false, false, false
-local conditionsMet, verifyReward = false, false
 local generatedCode, safePin = nil, nil
 local wrongPIN, failedHack = 0, 0
 
--- Function that checks that all conditions have been met before proceeding
-function checkConditions()
-    local hasItem = HasItem(Config.RegisterRobberyItem, 1)
+-- Function to check if player has required item & enough police (if applicable)
+local CheckConditions = function()
+    local hasItem = HasItem(Config.RegisterRobberyItem)
     if hasItem then
         if Config.RequirePolice then
             local policeCount = lib.callback.await('lation_247robbery:getPoliceCount', false)
             if policeCount >= Config.PoliceCount then
-                conditionsMet = true
-                initiateRegisterRobbery()
-            else
-                conditionsMet = false
-                activeRegister = false
-                ShowNotification(Notify.notEnoughPolice, 'error')
+                return true
             end
-        else
-            conditionsMet = true
-            initiateRegisterRobbery()
+            activeRegister = false
+            ShowNotification(Strings.Notify.notEnoughPolice, 'error')
+            return false
         end
-    else
-        conditionsMet = false
-        activeRegister = false
-        ShowNotification(Notify.missingItem, 'error')
+        return true
     end
+    activeRegister = false
+    ShowNotification(Strings.Notify.missingItem, 'error')
+    return false
 end
 
--- Function that runs after all conditions have been met
-function initiateRegisterRobbery()
-    if conditionsMet then
-        -- Obtain data used to send to PoliceDispatch event if needed
+-- Function to start the initial robbery process
+local InitiateRegisterRobbery = function()
+    if CheckConditions() then -- Ensure item & police status
+        -- Collect data for dispatch
         local coords = GetEntityCoords(cache.ped)
         local streetName = GetStreetNameFromHashKey(GetStreetNameAtCoord(coords.x, coords.y, coords.z))
         local data = {coords = coords, street = streetName}
         local cooldown = GlobalState.registerCooldown
-        if cooldown == false then
-            local success = lib.skillCheck(Config.RegisterDiffuculty, Config.RegisterInput)
-            if success then
+        -- Check cooldown status
+        if not cooldown then
+            -- Begin lockpicking emote
+            local dict, anim = Config.Animations.lockpick.animDict, Config.Animations.lockpick.animClip
+            lib.requestAnimDict(dict)
+            while not HasAnimDictLoaded(dict) do Wait(0) end
+            TaskPlayAnim(cache.ped, dict, anim, 8.0, 8.0, -1, 51, 1.0, false, false, false)
+            -- Start skillcheck
+            local skillcheck = lib.skillCheck(Config.RegisterDiffuculty, Config.RegisterInput)
+            ClearPedTasks(cache.ped)
+            if skillcheck then
+                -- Alert police
                 PoliceDispatch(data)
-                if lib.progressCircle({
-                    label = ProgressCircle.registerLabel,
-                    duration = ProgressCircle.registerDuration,
-                    position = ProgressCircle.position,
-                    useWhileDead = false,
-                    canCancel = true,
-                    disable = { car = true, move = true, combat = true },
-                    anim = { dict = 'anim@heists@ornate_bank@grab_cash', clip = 'grab' }
-                }) then
+                if lib[progressType](Config.Animations.register) then
+                    -- Check if they got the code to skip computer hack
                     local codeChance = math.random(1, 100)
                     if codeChance <= Config.CodeChance then
                         generatedCode = math.random(1111, 9999)
                         safePin = generatedCode
                         local note = lib.alertDialog({
-                            header = AlertDialog.registerHeader,
-                            content = AlertDialog.registerContent ..generatedCode,
-                            centered = true,
-                            cancel = true,
-                            labels = {
-                                cancel = AlertDialog.registerCancelButton,
-                                confirm = AlertDialog.registerConfirmButton
-                            }
+                            header = Strings.AlertDialog.registerHeader,
+                            content = Strings.AlertDialog.registerContent ..generatedCode,
+                            centered = true, cancel = false,
+                            labels = {cancel = Strings.AlertDialog.registerCancelButton, confirm = Strings.AlertDialog.registerConfirmButton}
                         })
                         if note == 'confirm' then
-                            -- Code was received, robbery proceeds
-                            -- Player gets rewarded, cooldown begins
-                            -- The safe becomes available, player must simply input the code to unlock
                             activeSafe = true
-                            verifyReward = true
-                            local reward = lib.callback.await('lation_247robbery:registerSuccessful', false, verifyReward)
-                            if reward then
-                                verifyReward = false
-                            else
-                                -- Kick/drop player? Potential cheating?
-                                verifyReward = false
-                            end
-                        else
-                            -- Player responded "Who Cares?" to the code they received, so robbery ends (meme'd)
-                            -- Player is not rewarded
-                            -- Cooldown is not activated
-                            activeRegister = false
+                            TriggerServerEvent('lation_247robbery:RewardRobbery', cache.serverId, 'register')
                         end
                     else
-                        -- No code was received, player must proceed by hacking the PC
-                        -- Player gets rewarded, cooldown begins
-                        -- The computer becomes available, player must simply complete a hack to proceed
+                        -- No code, proceed with normal robbery
                         activeComputer = true
-                        verifyReward = true
-                        local reward = lib.callback.await('lation_247robbery:registerSuccessful', false, verifyReward)
-                        if reward then
-                            verifyReward = false
-                        else
-                            -- Kick/drop player? Potential cheating?
-                            verifyReward = false
-                        end
+                        TriggerServerEvent('lation_247robbery:RewardRobbery', cache.serverId, 'register')
                     end
                 else
-                    -- Player cancelled the cash register robbery progress, so robbery ends
-                    -- Player is not rewarded
-                    -- Cooldown is not activated
+                    -- Player cancelled robbery
                     activeRegister = false
-                    ShowNotification(Notify.robberyCancel, 'error')
+                    ShowNotification(Strings.Notify.robberyCancel, 'error')
                 end
             else
-                -- Player failed to successfully lockpick the register, so a chance at breaking happens below
-                local lockpickBreakChance = math.random(1, 100)
-                if lockpickBreakChance <= Config.LockpickBreakChance then
-                    TriggerServerEvent('lation_247robbery:removeItem', cache.serverId, Config.RegisterRobberyItem, 1)
-                    ShowNotification(Notify.lockpickBroke, 'error')
+                -- Failed skillcheck - potential lockpick breaking
+                local breakChance = math.random(1, 100)
+                if breakChance <= Config.LockpickBreakChance then
+                    TriggerServerEvent('lation_247robbery:RemoveItem', cache.serverId, Config.RegisterRobberyItem, 1)
+                    ShowNotification(Strings.Notify.lockpickBroke, 'error')
                 end
                 activeRegister = false
             end
         else
-            -- A cooldown is currently active, so the robbery will not proceed
-            ShowNotification(Notify.registerCooldown, 'error')
+            -- A cooldown is currently active
+            ShowNotification(Strings.Notify.registerCooldown, 'error')
             activeRegister = false
         end
-    else
-        return -- Conditions have not been met from the above function
     end
 end
 
--- Function that runs after the register robbery if necessary
-function initiateComputerHack()
-    activeComputer = false -- Deactivates target option
-    if failedHack < Config.MaxHackAttempts then -- Checks hack attempts
-        lib.requestAnimDict('anim@heists@prison_heiststation@cop_reactions', 100)
-        TaskPlayAnim(cache.ped, 'anim@heists@prison_heiststation@cop_reactions', 'cop_b_idle', 8.0, 8.0, -1, 1, 1, false, false, false)
+-- Function to handle hacking the computer if required
+local InitiateComputerHack = function()
+    activeComputer = false -- Deactive target
+    if failedHack < Config.MaxHackAttempts then -- Check hack attempts
+        -- Load and play anim during hacking
+        local dict, anim = Config.Animations.hackPC.animDict, Config.Animations.hackPC.animClip
+        lib.requestAnimDict(dict)
+        while not HasAnimDictLoaded(dict) do Wait(0) end
+        TaskPlayAnim(cache.ped, dict, anim, 8.0, 8.0, -1, 1, 1, false, false, false)
+        -- If questionnaire enabled, then proceed
         if Config.EnableQuestionnaire then
-            local questions = lib.inputDialog(InputDialog.questionsHeader, {
-                {type = 'input', label = InputDialog.questionOne, description = Config.Questions.question1.question, required = true, icon = Config.Questions.question1.icon},
-                {type = 'input', label = InputDialog.questionTwo, description = Config.Questions.question2.question, required = true, icon = Config.Questions.question2.icon},
-                {type = 'input', label = InputDialog.questionThree, description = Config.Questions.question3.question, required = true, icon = Config.Questions.question3.icon},
-                {type = 'select', label = InputDialog.questionFour, description = Config.Questions.question4.question, options = {
+            local questions = lib.inputDialog(Strings.InputDialog.questionsHeader, {
+                {type = 'input', label = Strings.InputDialog.questionOne, description = Config.Questions.question1.question, required = true, icon = Config.Questions.question1.icon},
+                {type = 'input', label = Strings.InputDialog.questionTwo, description = Config.Questions.question2.question, required = true, icon = Config.Questions.question2.icon},
+                {type = 'input', label = Strings.InputDialog.questionThree, description = Config.Questions.question3.question, required = true, icon = Config.Questions.question3.icon},
+                {type = 'select', label = Strings.InputDialog.questionFour, description = Config.Questions.question4.question, options = {
                     { value = '1', label = Config.Questions.question4.options.option1 },
                     { value = '2', label = Config.Questions.question4.options.option2 },
                     { value = '3', label = Config.Questions.question4.options.option3 },
                     { value = '4', label = Config.Questions.question4.options.option4 }
                 }, required = true, icon = Config.Questions.question4.icon}
             })
-            if not questions then
+            if not questions then -- No answers or nil, reset & return
                 activeComputer = true
                 ClearPedTasks(cache.ped)
                 return
             end
-            if string.lower(questions[1]) == string.lower(Config.Answers.question1Answer) and string.lower(questions[2]) == string.lower(Config.Answers.question2Answer) 
-            and string.lower(questions[3]) == string.lower(Config.Answers.question3Answer) and string.lower(questions[4]) == tostring(Config.Answers.question4Answer) then 
+            -- Check answers
+            if string.lower(questions[1]) == string.lower(Config.Answers.question1Answer) and string.lower(questions[2]) == string.lower(Config.Answers.question2Answer)
+            and string.lower(questions[3]) == string.lower(Config.Answers.question3Answer) and string.lower(questions[4]) == tostring(Config.Answers.question4Answer) then
+                -- Player passed, continue
                 failedHack = 0
                 ClearPedTasks(cache.ped)
                 generatedCode = math.random(1111, 9999)
                 safePin = generatedCode
                 lib.alertDialog({
-                    header = AlertDialog.computerHeader,
-                    content = AlertDialog.computerContent ..generatedCode,
+                    header = Strings.AlertDialog.computerHeader,
+                    content = Strings.AlertDialog.computerContent ..generatedCode,
                     centered = true,
                     cancel = false,
                     labels = {
-                        confirm = AlertDialog.computerConfirmButton
+                        confirm = Strings.AlertDialog.computerConfirmButton
                     }
                 })
                 activeSafe = true
             else
+                -- Player failed, reset and track fail
                 ClearPedTasks(cache.ped)
                 activeComputer = true
                 failedHack = failedHack + 1
-                ShowNotification(Notify.failedHack, 'error')
+                ShowNotification(Strings.Notify.failedHack, 'error')
             end
         else
-            local success = lib.skillCheck(Config.ComputerDifficulty, Config.ComputerInput)
-            if success then -- Player passes the hack
+            -- Questionnaire disabled, use skillCheck
+            local skillcheck = lib.skillCheck(Config.ComputerDifficulty, Config.ComputerInput)
+            if skillcheck then
+                -- Player passed
                 failedHack = 0
                 ClearPedTasks(cache.ped)
                 generatedCode = math.random(1111, 9999)
                 safePin = generatedCode
                 lib.alertDialog({
-                    header = AlertDialog.computerHeader,
-                    content = AlertDialog.computerContent ..generatedCode,
+                    header = Strings.AlertDialog.computerHeader,
+                    content = Strings.AlertDialog.computerContent ..generatedCode,
                     centered = true,
                     cancel = false,
                     labels = {
-                        confirm = AlertDialog.computerConfirmButton
+                        confirm = Strings.AlertDialog.computerConfirmButton
                     }
                 })
                 activeSafe = true
-            else -- Player failed the hack
+            else
+                -- Player failed
                 ClearPedTasks(cache.ped)
                 activeComputer = true
                 failedHack = failedHack + 1
-                ShowNotification(Notify.failedHack, 'error')
+                ShowNotification(Strings.Notify.failedHack, 'error')
             end
         end
-    else -- Player has failed the hack too many times, robbery ends/restarts
+    else
+        -- Too many failed attempts
         activeRegister = false
         activeComputer = false
         failedHack = 0
-        ShowNotification(Notify.tooManyHackFails, 'error')
+        ShowNotification(Strings.Notify.tooManyHackFails, 'error')
     end
 end
 
--- Function that runs after a successful register robbery and/or computer hacking
-function initiateSafeRobbery()
-    activeSafe = false -- Deactivates target option 
-    if wrongPIN < Config.MaxCodeAttempts then -- Checks PIN attempts
-        local inputCode = lib.inputDialog(InputDialog.safeHeader, {
-            {type = 'input', label = InputDialog.safeLabel, description = InputDialog.safeDescription, placeholder = InputDialog.safePlaceholder, icon = InputDialog.safeIcon, required = true, min = 4, max = 16},
+-- Function to handle the safe robbery
+local InitiateSafeRobbery = function()
+    activeSafe = false -- Disable target option
+    if wrongPIN < Config.MaxCodeAttempts then -- Ensure not put wrong pin too many times
+        local inputCode = lib.inputDialog(Strings.InputDialog.safeHeader, {
+            {type = 'input', label = Strings.InputDialog.safeLabel, description = Strings.InputDialog.safeDescription, placeholder = Strings.InputDialog.safePlaceholder, icon = Strings.InputDialog.safeIcon, required = true, min = 4, max = 16},
         })
         if not inputCode then
             activeSafe = true
@@ -215,118 +191,110 @@ function initiateSafeRobbery()
         if convertedCode ~= safePin then -- Wrong PIN
             wrongPIN = wrongPIN + 1
             activeSafe = true
-            ShowNotification(Notify.wrongPin, 'error')
+            ShowNotification(Strings.Notify.wrongPin, 'error')
         elseif convertedCode == safePin then -- Correct PIN
             activeSafe = false
             wrongPIN = 0
-            if lib.progressCircle({
-                label = ProgressCircle.safeLabel,
-                duration = ProgressCircle.safeDuration,
-                position = ProgressCircle.position,
-                useWhileDead = false,
-                canCancel = true,
-                disable = { car = true, move = true, combat = true },
-                anim = { dict = 'anim@heists@ornate_bank@grab_cash', clip = 'grab' }
-            }) then
+            if lib[progressType](Config.Animations.safe) then
                 activeRegister = false
-                verifyReward = true
-                local reward = lib.callback.await('lation_247robbery:safeSuccessful', false, verifyReward)
-                if reward then
-                    verifyReward = false
-                else
-                    -- Kick/drop player? Potential cheating?
-                    verifyReward = false
-                end
+                TriggerServerEvent('lation_247robbery:RewardRobbery', cache.serverId, 'safe')
             else
-                -- cancelled looting the safe
-                -- notify of cancel
+                ShowNotification('You cancelled robbing the safe', 'error')
             end
-        else -- Something went wrong
-            ShowNotification(Notify.errorOccured, 'error')
         end
-    else -- Player has input a wrong PIN too many times, robbery ends/restarts
+    else
+        -- Too many failed attempts
         activeRegister = false
         activeSafe = false
         wrongPIN = 0
-        ShowNotification(Notify.tooManySafeFails, 'error')
+        ShowNotification(Strings.Notify.tooManySafeFails, 'error')
     end
 end
 
--- Creates all the targets for the registers noted in the Config
-for k, v in pairs(Config.Locations.Registers) do
-    qtarget:AddCircleZone('cash_register' ..k, v, 0.35, {
-        name = 'cash_register' ..k,
-        debugPoly = Target.debugTargets,
-    }, {
+-- Create all the targets for the cash registers
+for key, coords in pairs(Config.Locations.Registers) do
+    local data = {
+        name = 'cash_register' ..key,
+        coords = coords,
+        radius = 0.35,
+        debug = Config.Debug,
         options = {
             {
-                icon = Target.registerIcon,
-                label = Target.registerLabel,
+                icon = Strings.Target.registerIcon,
+                label = Strings.Target.registerLabel,
                 canInteract = function()
-                    if activeRegister then
-                        return false
-                    else
+                    if not activeRegister then
                         return true
                     end
+                    return false
                 end,
                 action = function()
                     activeRegister = true
-                    checkConditions()
-                end
+                    if CheckConditions() then
+                        InitiateRegisterRobbery()
+                    end
+                end,
+                onSelect = function()
+                    activeRegister = true
+                    if CheckConditions() then
+                        InitiateRegisterRobbery()
+                    end
+                end,
+                distance = 2
             }
-        },
-        distance = 2,
-    })
+        }
+    }
+    AddCircleZone(data)
 end
 
--- Creates all the targets for the computers noted in the Config
-for k, v in pairs(Config.Locations.Computers) do
-    qtarget:AddCircleZone('computer' ..k, v, 0.35, {
-        name = 'computer' ..k,
-        debugPoly = Target.debugTargets,
-    }, {
+-- Creates all the targets for the computers
+for key, coords in pairs(Config.Locations.Computers) do
+    local data = {
+        name = 'computer' ..key,
+        coords = coords,
+        radius = 0.35,
+        debug = Config.Debug,
         options = {
             {
-                icon = Target.computerIcon,
-                label = Target.computerLabel,
+                icon = Strings.Target.computerIcon,
+                label = Strings.Target.computerLabel,
                 canInteract = function()
                     if activeComputer then
                         return true
-                    else
-                        return false
                     end
+                    return false
                 end,
-                action = function()
-                    initiateComputerHack()
-                end
+                action = InitiateComputerHack,
+                onSelect = InitiateComputerHack,
+                distance = 2
             }
-        },
-        distance = 2,
-    })
+        }
+    }
+    AddCircleZone(data)
 end
 
--- Creates all the targets for the safes noted in the Config
-for k, v in pairs(Config.Locations.Safes) do
-    qtarget:AddCircleZone('safe' ..k, v, 0.45, {
-        name = 'safe' ..k,
-        debugPoly = Target.debugTargets,
-    }, {
+-- Creates all the targets for the safes
+for key, coords in pairs(Config.Locations.Safes) do
+    local data = {
+        name = 'safe' ..key,
+        coords = coords,
+        radius = 0.45,
+        debug = Config.Debug,
         options = {
             {
-                icon = Target.safeIcon,
-                label = Target.safeLabel,
+                icon = Strings.Target.safeIcon,
+                label = Strings.Target.safeLabel,
                 canInteract = function()
                     if activeSafe then
                         return true
-                    else
-                        return false
                     end
+                    return false
                 end,
-                action = function()
-                    initiateSafeRobbery()
-                end
+                action = InitiateSafeRobbery,
+                onSelect = InitiateSafeRobbery,
+                distance = 2
             }
-        },
-        distance = 2,
-    })
+        }
+    }
+    AddCircleZone(data)
 end

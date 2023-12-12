@@ -35,6 +35,20 @@ GetName = function(source)
     end
 end
 
+-- Function to get a players identifier
+GetIdentifier = function(source)
+    local player = GetPlayer(source)
+    if player then
+        if Framework == 'esx' then
+            return player.getIdentifier()
+        elseif Framework == 'qb' then
+            return player.PlayerData.citizenid
+        else
+            -- Add support for a custom framework here
+        end
+    end
+end
+
 -- Function to add an item to inventory
 AddItem = function(source, item, count, slot, metadata)
     local player = GetPlayer(source)
@@ -44,7 +58,11 @@ AddItem = function(source, item, count, slot, metadata)
         if Framework == 'esx' then
             return player.addInventoryItem(item, count, metadata, slot)
         elseif Framework == 'qb' then
-            player.Functions.AddItem(item, 1, false, count)
+            if Config.Metadata then
+                player.Functions.AddItem(item, 1, false, count)
+            else
+                player.Functions.AddItem(item, count)
+            end
             TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], 'add')
         else
             -- Add support for a custom framework here
@@ -69,6 +87,7 @@ RemoveItem = function(source, item, count, slot, metadata)
     end
 end
 
+-- Function use to count number of players with job are online
 PlayersWithJob = function(jobName)
     local jobCount = 0
     if Framework == 'esx' then

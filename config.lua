@@ -1,18 +1,44 @@
 Config = {}
+Config.Debug = false
+
+-- Target system
+-- Available options are: 'ox_target', 'qb-target', 'qtarget' & 'custom'
+-- custom' needs to be added to client/functions.lua
+Config.Target = 'ox_target'
+
+-- Select your ox_lib progress UI preference
+-- Options are 'circle' and 'bar'
+Config.ProgressType = 'circle'
+
+-- Do you want to be notified via server console if an update is available?
+-- True if yes, false if no
+Config.VersionCheck = true
+
+-- Discord Webhook log configs
+Config.EnableLogs = false
+Config.DiscordWebhookLink = ''
+Config.WebhookName = '247 Robbery Logs'
+Config.WebhookImage = 'https://i.imgur.com/ILTkWBh.png'
+Config.WebhookFooterImage = 'https://i.imgur.com/ILTkWBh.png'
 
 -- General configs
-Config.RequirePolice = true -- Set to true if you want to require police in order to rob stores (requires Config.Framework be set to 'esx' or 'qbcore' if true)
-Config.PoliceCount = 0  -- If RequirePolice is true, how many must be online to rob stores?
+Config.RequirePolice = false -- Set to true if you want to require police in order to rob stores (requires Config.Framework be set to 'esx' or 'qbcore' if true)
+Config.PoliceCount = 3  -- If RequirePolice is true, how many must be online to rob stores?
 Config.PoliceJobs = { 'police', 'sheriff' } -- Add your police job names here
-Config.Dispatch = 'cd_dispatch' -- Available options: 'cd_dispatch', 'linden_outlawalert', 'ps-dispatch', 'qs-dispatch' and 'custom'
+Config.Dispatch = 'custom' -- Available options: 'cd_dispatch', 'linden_outlawalert', 'ps-dispatch', 'qs-dispatch' and 'custom'
+
+-- Config.Metadata is for QBCore users only
+-- If true, the resource will reward metadata values for 'markedbills' or similar item
+-- If false, the resource will reward the item without metadata, and just 1-to-1
+Config.Metadata = true
 
 -- Register configs
-Config.RegisterRobberyItem = 'advanced_lockpick' -- The item name required to rob a cash register
+Config.RegisterRobberyItem = 'lockpick' -- The item name required to rob a cash register
 Config.RegisterMinCooldown = 10 -- The minimum cooldown time for robbing registers once one has been robbed
 Config.RegisterMaxCooldown = 20 -- The maximum cooldown time for robbing registers once one has been robbed
 Config.RegisterDiffuculty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', 'easy', 'easy', 'easy', 'easy' } -- The skillcheck difficulty, can be 'easy', 'medium' or 'hard' in any order and any quantity
 Config.RegisterInput = { 'W', 'A', 'S', 'D' } -- The keys that are used for the skillcheck minigame, can be any keys
-Config.RegisterRewardItem = 'black_money' -- The item that is rewarded upon a successful register robbery (Set to "markedbills" if using QBCore)
+Config.RegisterRewardItem = 'black_money' -- The item that is rewarded upon a successful register robbery
 Config.RegisterRewardRandom = true -- Set true if you want to reward a random quantity of the above item, otherwise set false
 Config.RegisterRewardQuantity = 1000 -- If RegisterRewardRandom = false then this is the quantity rewarded, if true then can be ignored
 Config.RegisterRewardMinQuantity = 1000 -- If RegisterRewardRandom = true then this is the minimum quantity, otherwise can be ignored
@@ -24,7 +50,7 @@ Config.CodeChance = 10 -- The percentage chance a player receives a code from th
 Config.SafeMinCooldown = 10 -- The minimum cooldown time for robbing safes once one has been robbed
 Config.SafeMaxCooldown = 20 -- The maximum cooldown time for robbing safes once one has been robbed
 Config.MaxCodeAttempts = 3 -- The maximum amount of attempts to input the correct code to unlock safe before having to restart robbery
-Config.SafeRewardItem = 'black_money' -- The item that is rewarded upon a successful safe robbery (Set to "markedbills" if using QBCore)
+Config.SafeRewardItem = 'black_money' -- The item that is rewarded upon a successful safe robbery
 Config.SafeRewardRandom = true -- Set true if you want to reward a random quantity of the above item, otherwise set false
 Config.SafeRewardQuantity = 2000 -- If SafeRewardRandom = false then this is the quantity rewarded, if true then can be ignored
 Config.SafeRewardMinQuantity = 2000 -- If SafeRewardRandom = true then this is the minimum quantity, otherwise can be ignored
@@ -62,11 +88,44 @@ Config.Questions = { -- This is only used if Config.EnableQuestionnaire is true
     },
 }
 
+-- Customize the answers to the questionnaire here if enabled
 Config.Answers = { -- This is only used if Config.EnableQuestionnaire is true
     question1Answer = 'power supply unit',
     question2Answer = 'hypertext transfer protocol secure',
     question3Answer = 'graphics processing unit',
     question4Answer = 3 -- Just the option number of the correct answer from above (option1 = 1, option2 = 2, etc)
+}
+
+-- Manage all animations here
+Config.Animations = {
+    lockpick = {
+        animDict = 'missheistfbisetup1',
+        animClip = 'hassle_intro_loop_f'
+    },
+    register = {
+        label = 'Grabbing cash..',
+        duration = 30000,
+        position = 'middle',
+        useWhileDead = false,
+        canCancel = true,
+        disable = { car = true, move = true, combat = true },
+        anim = { dict = 'anim@heists@ornate_bank@grab_cash', clip = 'grab' },
+        prop = { model = 'p_ld_heist_bag_s', bone = 40269, pos = vec3(0.0454, 0.2131, -0.1887), rot = vec3(66.4762, 7.2424, -71.9051) }
+    },
+    hackPC = {
+        animDict = 'anim@heists@prison_heiststation@cop_reactions',
+        animClip = 'cop_b_idle'
+    },
+    safe = {
+        label = 'Looting safe..',
+        duration = 30000,
+        position = 'middle',
+        useWhileDead = false,
+        canCancel = true,
+        disable = { car = true, move = true, combat = true },
+        anim = { dict = 'anim@heists@ornate_bank@grab_cash', clip = 'grab' },
+        prop = { model = 'p_ld_heist_bag_s', bone = 40269, pos = vec3(0.0454, 0.2131, -0.1887), rot = vec3(66.4762, 7.2424, -71.9051) }
+    }
 }
 
 -- Store configs
@@ -119,62 +178,4 @@ Config.Locations = {
         vec3(-710.1920, -904.1401, 18.5740), -- Ginger Street
         vec3(1159.0540, -314.1202, 68.5665) -- Mirror Park Blvd
     }
-}
-
--- String configs
-Notify = {
-    title = 'Convenience Store', -- The title for all notifications
-    icon = 'store', -- The icon for all notifications
-    position = 'top', -- The position of all notifications
-    registerCooldown = 'Stores cannot be robbed this often - please wait and try again later',
-    notEnoughPolice = 'There is not enough Police available in the city to do this',
-    missingItem = 'You are missing a required tool to rob this register',
-    lockpickBroke = 'You broke the lockpick and failed to open the register',
-    robberyCancel = 'You stop robbing the register',
-    failedHack = 'You failed hacking into the computer',
-    wrongPin = 'You input the wrong pin and the safe remains locked',
-    errorOccured = 'Something went wrong - please try again',
-    tooManyHackFails = 'You\'ve failed to hack the computer too many times and failed robbing the store',
-    tooManySafeFails = 'You\'ve input the wrong PIN too many times and failed robbing the safe'
-}
-
-Target = {
-    debugTargets = false,
-    registerLabel = 'Rob register',
-    registerIcon = 'fas fa-lock',
-    computerLabel = 'Login',
-    computerIcon = 'fas fa-computer',
-    safeLabel = 'Unlock',
-    safeIcon = 'fas fa-key'
-}
-
-ProgressCircle = {
-    position = 'middle', -- The position for all progressCircle's
-    registerLabel = 'Grabbing cash..',
-    registerDuration = 30000,
-    safeLabel = 'Looting safe..',
-    safeDuration = 30000
-}
-
-AlertDialog = {
-    registerHeader = 'Note Found',
-    registerContent = 'You found an interesting note under the register with nothing but the following numbers written on it: ',
-    registerCancelButton = 'Who Cares?',
-    registerConfirmButton = 'Got it',
-    computerHeader = 'Code Exposed',
-    computerContent = 'You successfully hacked the computer and find the following code: ',
-    computerConfirmButton = 'Got it'
-}
-
-InputDialog = {
-    questionsHeader = 'Security Questions',
-    questionOne = 'Question #1',
-    questionTwo = 'Question #2',
-    questionThree = 'Question #3',
-    questionFour = 'Question #4',
-    safeHeader = 'Store Safe',
-    safeLabel = 'Enter PIN',
-    safeDescription = 'Input the PIN to unlock the safe',
-    safePlaceholder = '6969',
-    safeIcon = 'lock'
 }

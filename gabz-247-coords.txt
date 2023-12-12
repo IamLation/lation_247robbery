@@ -1,3 +1,5 @@
+You must replace the current Config.Locations table in config.lua with these ones if you use Gabz
+
 -- Store location configs for Gabz 24/7's
 Config.Locations = {
     Registers = {

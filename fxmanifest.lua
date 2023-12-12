@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'iamlation'
 description 'A 24/7 robbery script for FiveM'
-version '1.1.6'
+version '1.2.0'
 
 client_scripts {
     'bridge/client.lua',
@@ -18,5 +18,6 @@ server_scripts {
 
 shared_scripts {
     'config.lua',
+    'strings.lua',
     '@ox_lib/init.lua'
 }
