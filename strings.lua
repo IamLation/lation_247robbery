@@ -1,9 +1,6 @@
 Strings = {}
 
 Strings.Notify = {
-    title = 'Convenience Store', -- The title for all notifications
-    icon = 'store', -- The icon for all notifications
-    position = 'top', -- The position of all notifications
     registerCooldown = 'Stores cannot be robbed this often - please wait and try again later',
     notEnoughPolice = 'There is not enough Police available in the city to do this',
     missingItem = 'You are missing a required tool to rob this register',
@@ -17,35 +14,44 @@ Strings.Notify = {
 }
 
 Strings.Target = {
-    registerLabel = 'Rob register',
-    registerIcon = 'fas fa-lock',
-    computerLabel = 'Login',
-    computerIcon = 'fas fa-computer',
-    safeLabel = 'Unlock',
-    safeIcon = 'fas fa-key'
+    registers = {
+        label = 'Rob register',
+        icon = 'fas fa-lock'
+    },
+    computers = {
+        label = 'Login',
+        icon = 'fas fa-computer'
+    },
+    safes = {
+        label = 'Unlock',
+        icon = 'fas fa-key'
+    }
 }
 
 Strings.AlertDialog = {
-    registerHeader = 'Note Found',
-    registerContent = 'You found an interesting note under the register with nothing but the following numbers written on it: ',
-    registerCancelButton = 'Who Cares?',
-    registerConfirmButton = 'Got it',
-    computerHeader = 'Code Exposed',
-    computerContent = 'You successfully hacked the computer and find the following code: ',
-    computerConfirmButton = 'Got it'
+    noteFound = {
+        header = '**Note Found**',
+        content = 'You found an interesting note under the register with nothing but the following numbers written on it: ',
+        labels = { cancel = 'Who Cares?', confirm = 'Got it!' }
+    },
+    hacked = {
+        header = '**Code Exposed**',
+        content = 'You successfully hacked the computer and find the following code: ',
+        labels = { cancel = 'Cancel', confirm = 'Got it!' }
+    }
 }
 
 Strings.InputDialog = {
     questionsHeader = 'Security Questions',
-    questionOne = 'Question #1',
-    questionTwo = 'Question #2',
-    questionThree = 'Question #3',
-    questionFour = 'Question #4',
     safeHeader = 'Store Safe',
-    safeLabel = 'Enter PIN',
-    safeDescription = 'Input the PIN to unlock the safe',
-    safePlaceholder = '6969',
-    safeIcon = 'lock'
+    safe = {
+        type = 'input', -- Do not edit
+        label = 'Enter PIN',
+        description = 'Input the PIN to unlock the safe',
+        placeholder = '6969',
+        icon = 'fas fa-lock',
+        required = true -- Do not edit
+    }
 }
 
 Strings.Logs = {

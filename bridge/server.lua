@@ -1,4 +1,4 @@
-local invState = GetResourceState('ox_inventory')
+local ox_inv = GetResourceState('ox_inventory') == 'started'
 
 -- Get framework
 if GetResourceState('es_extended') == 'started' then
@@ -13,7 +13,9 @@ else
 end
 
 -- Get player from source
+--- @param source number
 GetPlayer = function(source)
+    if not source then return end
     if Framework == 'esx' then
         return ESX.GetPlayerFromId(source)
     elseif Framework == 'qb' then
@@ -24,44 +26,53 @@ GetPlayer = function(source)
 end
 
 -- Function to get a players name
+--- @param source number
 GetName = function(source)
     local player = GetPlayer(source)
-    if player then
-        if Framework == 'esx' then
-            return player.getName()
-        elseif Framework == 'qb' then
-            return player.PlayerData.charinfo.firstname..' '..player.PlayerData.charinfo.lastname
-        end
+    if not player then return end
+    if Framework == 'esx' then
+        return player.getName()
+    elseif Framework == 'qb' then
+        return player.PlayerData.charinfo.firstname..' '..player.PlayerData.charinfo.lastname
     end
 end
 
 -- Function to get a players identifier
+--- @param source number
 GetIdentifier = function(source)
     local player = GetPlayer(source)
-    if player then
-        if Framework == 'esx' then
-            return player.getIdentifier()
-        elseif Framework == 'qb' then
-            return player.PlayerData.citizenid
-        else
-            -- Add support for a custom framework here
-        end
+    if not player then return end
+    if Framework == 'esx' then
+        return player.getIdentifier()
+    elseif Framework == 'qb' then
+        return player.PlayerData.citizenid
+    else
+        -- Add support for a custom framework here
     end
 end
 
 -- Function to add an item to inventory
-AddItem = function(source, item, count, slot, metadata)
+--- @param source number
+--- @param item string
+--- @param count number
+AddItem = function(source, item, count)
     local player = GetPlayer(source)
-    if invState == 'started' then
-        return exports.ox_inventory:AddItem(source, item, count, metadata, slot)
+    if not player then return end
+    if ox_inv then
+        exports.ox_inventory:AddItem(source, item, count)
     else
         if Framework == 'esx' then
-            return player.addInventoryItem(item, count, metadata, slot)
+            return player.addInventoryItem(item, count)
         elseif Framework == 'qb' then
-            if Config.Metadata then
-                player.Functions.AddItem(item, 1, false, count)
+            if Config.Metadata and item == 'markedbills' and not ox_inv then
+                local worth = { worth = count }
+                player.Functions.AddItem(item, 1, false, worth)
             else
-                player.Functions.AddItem(item, count)
+                if item == 'cash' or item == 'bank' then
+                    player.Functions.AddMoney(item, count)
+                else
+                    player.Functions.AddItem(item, count)
+                end
             end
             TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], 'add')
         else
@@ -71,15 +82,19 @@ AddItem = function(source, item, count, slot, metadata)
 end
 
 -- Function to remove an item from inventory
-RemoveItem = function(source, item, count, slot, metadata)
+--- @param source number
+--- @param item string
+--- @param count number
+RemoveItem = function(source, item, count)
     local player = GetPlayer(source)
-    if invState == 'started' then
-        return exports.ox_inventory:RemoveItem(source, item, count, metadata, slot)
+    if not player then return end
+    if ox_inv then
+        exports.ox_inventory:RemoveItem(source, item, count)
     else
         if Framework == 'esx' then
-            return player.removeInventoryItem(item, count, metadata, slot)
+            return player.removeInventoryItem(item, count)
         elseif Framework == 'qb' then
-            player.Functions.RemoveItem(item, count, slot, metadata)
+            player.Functions.RemoveItem(item, count)
             TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items[item], "remove")
         else
             -- Add support for a custom framework here
@@ -88,7 +103,9 @@ RemoveItem = function(source, item, count, slot, metadata)
 end
 
 -- Function use to count number of players with job are online
+--- @param jobName table
 PlayersWithJob = function(jobName)
+    if not jobName then return end
     local jobCount = 0
     if Framework == 'esx' then
         for _, player in pairs(ESX.GetExtendedPlayers()) do

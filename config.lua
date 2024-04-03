@@ -1,99 +1,168 @@
-Config = {}
+Config = {} -- Do not alter
 Config.Debug = false
 
--- Target system
+-- 🔎 Looking for more high quality scripts?
+-- 🛒 Shop Now: https://lationscripts.com/github
+-- 💬 Join Discord: https://discord.gg/9EbY4nM5uu
+-- 😢 How dare you leave this option false?!
+Config.YouFoundTheBestScripts = false
+
+-- Choose your target system
 -- Available options are: 'ox_target', 'qb-target', 'qtarget' & 'custom'
 -- custom' needs to be added to client/functions.lua
 Config.Target = 'ox_target'
+
+-- Notification system, available options are: 'ox_lib', 'esx', 'qb', 'okok', 'sd-notify' & 'custom'
+-- 'custom' needs to be added to client/functions.lua
+Config.Notify = 'ox_lib'
 
 -- Select your ox_lib progress UI preference
 -- Options are 'circle' and 'bar'
 Config.ProgressType = 'circle'
 
 -- Do you want to be notified via server console if an update is available?
--- True if yes, false if no
 Config.VersionCheck = true
-
--- Discord Webhook log configs
-Config.EnableLogs = false
-Config.DiscordWebhookLink = ''
-Config.WebhookName = '247 Robbery Logs'
-Config.WebhookImage = 'https://i.imgur.com/ILTkWBh.png'
-Config.WebhookFooterImage = 'https://i.imgur.com/ILTkWBh.png'
-
--- General configs
-Config.RequirePolice = false -- Set to true if you want to require police in order to rob stores (requires Config.Framework be set to 'esx' or 'qbcore' if true)
-Config.PoliceCount = 3  -- If RequirePolice is true, how many must be online to rob stores?
-Config.PoliceJobs = { 'police', 'sheriff' } -- Add your police job names here
-Config.Dispatch = 'custom' -- Available options: 'cd_dispatch', 'linden_outlawalert', 'ps-dispatch', 'qs-dispatch' and 'custom'
 
 -- Config.Metadata is for QBCore users only
 -- If true, the resource will reward metadata values for 'markedbills' or similar item
 -- If false, the resource will reward the item without metadata, and just 1-to-1
 Config.Metadata = true
 
--- Register configs
-Config.RegisterRobberyItem = 'lockpick' -- The item name required to rob a cash register
-Config.RegisterMinCooldown = 10 -- The minimum cooldown time for robbing registers once one has been robbed
-Config.RegisterMaxCooldown = 20 -- The maximum cooldown time for robbing registers once one has been robbed
-Config.RegisterDiffuculty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', 'easy', 'easy', 'easy', 'easy' } -- The skillcheck difficulty, can be 'easy', 'medium' or 'hard' in any order and any quantity
-Config.RegisterInput = { 'W', 'A', 'S', 'D' } -- The keys that are used for the skillcheck minigame, can be any keys
-Config.RegisterRewardItem = 'black_money' -- The item that is rewarded upon a successful register robbery
-Config.RegisterRewardRandom = true -- Set true if you want to reward a random quantity of the above item, otherwise set false
-Config.RegisterRewardQuantity = 1000 -- If RegisterRewardRandom = false then this is the quantity rewarded, if true then can be ignored
-Config.RegisterRewardMinQuantity = 1000 -- If RegisterRewardRandom = true then this is the minimum quantity, otherwise can be ignored
-Config.RegisterRewardMaxQuantity = 5000 -- If RegisterRewardRandom = true then this is the maximum quantity, otherwise can be ignored
-Config.LockpickBreakChance = 50 -- The percentage chance the lockpick breaks when failing to lockpick a register
-Config.CodeChance = 10 -- The percentage chance a player receives a code from the register to skip the PC hack requirement
-
--- Safe configs
-Config.SafeMinCooldown = 10 -- The minimum cooldown time for robbing safes once one has been robbed
-Config.SafeMaxCooldown = 20 -- The maximum cooldown time for robbing safes once one has been robbed
-Config.MaxCodeAttempts = 3 -- The maximum amount of attempts to input the correct code to unlock safe before having to restart robbery
-Config.SafeRewardItem = 'black_money' -- The item that is rewarded upon a successful safe robbery
-Config.SafeRewardRandom = true -- Set true if you want to reward a random quantity of the above item, otherwise set false
-Config.SafeRewardQuantity = 2000 -- If SafeRewardRandom = false then this is the quantity rewarded, if true then can be ignored
-Config.SafeRewardMinQuantity = 2000 -- If SafeRewardRandom = true then this is the minimum quantity, otherwise can be ignored
-Config.SafeRewardMaxQuantity = 10000 -- If SafeRewardRandom = true then this is the maximum quantity, otherwise can be ignored
-
--- Computer configs
-Config.MaxHackAttempts = 3 -- The maximum amount of hack attempts to get the safe code before having to restart robbery
-Config.EnableQuestionnaire = true -- If true, the player will be asked a sequence of questions instead of the skillcheck below to hack the computer
-Config.ComputerDifficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', 'easy', 'easy', 'easy', 'easy' } -- The skillcheck difficulty, can be 'easy', 'medium' or 'hard' in any order and any quantity (If EnableQuestionnaire is true, this can be ignored)
-Config.ComputerInput = { 'W', 'A', 'S', 'D' } -- The keys that are used for the skillcheck minigame, can be any keys (If EnableQuestionnaire is true, this can be ignored)
-
--- Questionnaire configs
-Config.Questions = { -- This is only used if Config.EnableQuestionnaire is true
-    question1 = {
-        question = 'What is a PSU?',
-        icon = 'bolt'
-    },
-    question2 = {
-        question = 'What does "HTTPS" stand for?',
-        icon = 'lock'
-    },
-    question3 = {
-        question = 'What is a GPU?',
-        icon = 'desktop'
-    },
-    question4 = { -- This question is not typed but rather the player selects from a dropdown, the dropdown options displayed are below
-        question = 'What does CTRL + A do?',
-        icon = 'keyboard',
-        options = {
-            option1 = 'Copy text',
-            option2 = 'Paste text',
-            option3 = 'Select all',
-            option4 = 'Print page'
-        }
-    },
+-- Manage all the police options here
+Config.Police = {
+    -- Do you want to require police be online in order to rob stores?
+    -- Then set require = true! If false, police will not be required
+    require = false,
+    -- If require = true, how many must be online to rob the stores?
+    count = 3,
+    -- Add your police job(s) below
+    jobs = { 'police', 'sheriff' },
+    -- Set your dispatch system
+    -- Available options: 'cd_dispatch', 'linden_outlawalert', 'ps-dispatch', 'qs-dispatch' and 'custom'
+    dispatch = 'custom',
+    -- Risk is a feature you can enable that will increase the players
+    -- Reward payout based on the number of police online during the robbery!
+    -- Do you want to enable the risk feature?
+    risk = false,
+    -- If risk = true, percent is how much the reward payout increases
+    -- In percentage for EVERY cop online. If percent = 10 and there are
+    -- 3 police online, the reward payout will increase 30%
+    percent = 10
 }
 
--- Customize the answers to the questionnaire here if enabled
-Config.Answers = { -- This is only used if Config.EnableQuestionnaire is true
-    question1Answer = 'power supply unit',
-    question2Answer = 'hypertext transfer protocol secure',
-    question3Answer = 'graphics processing unit',
-    question4Answer = 3 -- Just the option number of the correct answer from above (option1 = 1, option2 = 2, etc)
+Config.Registers = {
+    -- Set the required item name below needed to rob a cash register
+    item = 'lockpick',
+    -- Once a register has been robbed, a cooldown starts to avoid chain-robbing.
+    -- Set the minimum and maximum cooldown times below - this is in minutes
+    -- Default cooldown is 10-20 minutes
+    cooldown = { min = 10, max = 20 },
+    -- Set the skillcheck difficulty levels below
+    -- You can set 'easy', 'medium' or 'hard' in any order
+    -- And in any amount/quantity - Learn more about the skillcheck
+    -- Here: https://overextended.dev/ox_lib/Modules/Interface/Client/skillcheck
+    difficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', },
+    -- The 'inputs' are the keys that will be used for the skillcheck
+    -- Minigame and can be set to any key or keys of your choice
+    inputs = { 'W', 'A', 'S', 'D' },
+    -- After a successful register robbery, what item do you want to reward
+    -- And how much of it? Set the item = 'name' below and min/max quantites
+    reward = { item = 'black_money', min = 1000, max = 1000 },
+    -- If a player fails to successfully lockpick the register
+    -- There is a chance that their lockpick will break. In percentage,
+    -- What chance do you want their lockpick to break? To never break, set 0
+    -- To break every time, set 100
+    breakChange = 50,
+    -- After a player succesfully robs a register, there is this "noteChance" they
+    -- "Find" the safe's PIN "under the register" and can skip the computer hacking
+    -- Step if found. In percentage, what chance do they have to find this note?
+    noteChance = 10
+}
+
+Config.Computers = {
+    -- When a player is attempting to hack the computer how many
+    -- Attempts do you want to allow? By default, after 3 failed attempts
+    -- The robbery will end and not proceed any further
+    maxAttempts = 3,
+    -- Do you want to enable the questionnaire hack? If true, this will replace
+    -- The skillcheck hack with a series of questions the player must answer correctly
+    questionnaire = false,
+    -- Set the skillcheck difficulty levels below (only used if questionnaire = false)
+    -- You can set 'easy', 'medium' or 'hard' in any order
+    -- And in any amount/quantity - Learn more about the skillcheck
+    -- Here: https://overextended.dev/ox_lib/Modules/Interface/Client/skillcheck
+    difficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', },
+    -- The 'inputs' are the keys that will be used for the skillcheck
+    -- Minigame and can be set to any key or keys of your choice
+    -- (only used if questionnaire = false)
+    inputs = { 'W', 'A', 'S', 'D' },
+}
+
+Config.Safes = {
+    -- Once a safe has been robbed, a cooldown starts to avoid chain-robbing.
+    -- Set the minimum and maximum cooldown times below - this is in minutes
+    -- Default cooldown is 10-20 minutes
+    cooldown = { min = 10, max = 20 },
+    -- When a player is attempting to hack the safe (inputting the PIN) how
+    -- Many attempts do you want to allow? By default, after 3 failed attempts
+    -- The robbery will end and not proceed (they will not be rewarded)
+    maxAttempts = 3,
+    -- After a successful safe robbery, what item do you want to reward
+    -- And how much of it? Set the item = 'name' below and min/max quantites
+    reward = { item = 'black_money', min = 2000, max = 7000 },
+}
+
+-- Create, edit & manage all the questionnaire related options here if enabled
+-- You can create as many questions and answers as you wish
+Config.Questionnaire = {
+    questions = {
+        [1] = {
+            type = 'input',
+            label = 'Question #1',
+            description = 'What is a PSU?',
+            icon = 'fas fa-bolt',
+            required = true
+        },
+        [2] = {
+            type = 'input',
+            label = 'Question #2',
+            description = 'What does "HTTPS" stand for?',
+            icon = 'fas fa-lock',
+            required = true
+        },
+        [3] = {
+            type = 'input',
+            label = 'Question #3',
+            description = 'What is a GPU?',
+            icon = 'fas fa-desktop',
+            required = true
+        },
+        [4] = {
+            type = 'select',
+            label = 'Question #4',
+            description = 'What does CTRL + A do?',
+            icon = 'fas fa-keyboard',
+            required = true,
+            options = {
+                { value = 1, label = 'Copy text' },
+                { value = 2, label = 'Paste text' },
+                { value = 3, label = 'Select all' },
+                { value = 4, label = 'Print page' },
+            }
+        },
+        -- Add more questions here, following the same format as above
+        -- Be sure to increment the numbers correctly, [5], [6], etc
+    },
+    -- All the answers to the above questions must be placed here
+    -- Put the answers in the same order the questions are above
+    -- The answer to question [3] above should be [3] here as well
+    -- Note: answers to type = 'select' should be the value numer
+    answers = {
+        [1] = 'power supply unit',
+        [2] = 'hypertext transfer protocol secure',
+        [3] = 'graphics processing unit',
+        [4] = 3
+    }
 }
 
 -- Manage all animations here
@@ -105,7 +174,7 @@ Config.Animations = {
     register = {
         label = 'Grabbing cash..',
         duration = 30000,
-        position = 'middle',
+        position = 'bottom',
         useWhileDead = false,
         canCancel = true,
         disable = { car = true, move = true, combat = true },
@@ -119,9 +188,9 @@ Config.Animations = {
     safe = {
         label = 'Looting safe..',
         duration = 30000,
-        position = 'middle',
+        position = 'bottom',
         useWhileDead = false,
-        canCancel = true,
+        canCancel = false,
         disable = { car = true, move = true, combat = true },
         anim = { dict = 'anim@heists@ornate_bank@grab_cash', clip = 'grab' },
         prop = { model = 'p_ld_heist_bag_s', bone = 40269, pos = vec3(0.0454, 0.2131, -0.1887), rot = vec3(66.4762, 7.2424, -71.9051) }

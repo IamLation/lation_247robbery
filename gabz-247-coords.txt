@@ -18,7 +18,7 @@ Config.Locations = {
         vec3(-47.2251, -1757.5423, 29.5983), -- Grove Street
         vec3(-706.7102, -913.5667, 19.3929), -- Ginger Street
         vec3(1164.1452, -322.7899, 69.3824), -- Mirror Park Blvd
-        vec3(813.3516, -781.0529, 26.4238) -- Otto's Grotto (uncomment if applicable)
+        vec3(813.3516, -781.0529, 26.4238) -- Otto's Grotto
     },
     Computers = {
         vec3(29.5666, -1340.5445, 29.5400), -- Innocence Blvd
@@ -36,7 +36,7 @@ Config.Locations = {
         vec3(-44.7806, -1748.8189, 29.4642), -- Grove Street
         vec3(-710.4782, -905.2836, 19.2711), -- Ginger Street
         vec3(1158.9605, -315.2624, 69.2748), -- Mirror Park Blvd
-        vec3(817.5401, -775.8287, 26.2710) -- Otto's Grotto (uncomment if applicable)
+        vec3(817.5401, -775.8287, 26.2710) -- Otto's Grotto
     },
     Safes = {
         vec3(31.5539, -1339.2442, 29.9318), -- Innocence Blvd
@@ -54,6 +54,6 @@ Config.Locations = {
         vec3(-43.8009, -1748.0804, 28.7776), -- Grove Street
         vec3(-710.1920, -904.1401, 18.5740), -- Ginger Street
         vec3(1159.0540, -314.1202, 68.5665), -- Mirror Park Blvd
-        vec3(819.6384, -774.5783, 26.5440) -- Otto's Grotto (uncomment if applicable)
+        vec3(819.6384, -774.5783, 26.5440) -- Otto's Grotto
     }
 }

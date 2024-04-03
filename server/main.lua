@@ -1,5 +1,6 @@
 GlobalState.registerCooldown = false
 GlobalState.safeCooldown = false
+local minutes = 60000
 
 -- Function used to make numbers prettier (Credits to ESX for the function)
 --- @param value number
@@ -12,20 +13,27 @@ end
 local RegisterCooldown = function()
     SetTimeout(2000, function()
         GlobalState.registerCooldown = true
-        local cooldown = math.random(Config.RegisterMinCooldown * 60000, Config.RegisterMaxCooldown * 60000)
-        local format = cooldown / 1000 / 60
-        local cooldownRound = math.floor(format)
-        DiscordLogs(
-            Strings.Logs.titles.cooldownA,
-            Strings.Logs.messages.cooldownRA ..cooldownRound .. ' ' ..Strings.Logs.messages.minutes,
-            Strings.Logs.colors.red
-        )
+        local cooldown = math.random(Config.Registers.cooldown.min, Config.Registers.cooldown.max) * minutes
+        local format = math.floor(cooldown / minutes)
+        if Logs.Types.cooldown.enabled then
+            local logData = {
+                link = Logs.Types.cooldown.webhook,
+                title = Strings.Logs.titles.cooldownA,
+                message = Strings.Logs.messages.cooldownRA ..format .. ' ' ..Strings.Logs.messages.minutes,
+                color = Strings.Logs.colors.red
+            }
+            DiscordLogs(logData)
+        end
         Wait(cooldown)
-        DiscordLogs(
-            Strings.Logs.titles.cooldownI,
-            Strings.Logs.messages.cooldownRI,
-            Strings.Logs.colors.green
-        )
+        if Logs.Types.cooldown.enabled then
+            local logData = {
+                link = Logs.Types.cooldown.webhook,
+                title = Strings.Logs.titles.cooldownI,
+                message = Strings.Logs.messages.cooldownRI,
+                color = Strings.Logs.colors.green
+            }
+            DiscordLogs(logData)
+        end
         GlobalState.registerCooldown = false
     end)
 end
@@ -34,20 +42,27 @@ end
 local SafeCooldown = function()
     SetTimeout(2000, function()
         GlobalState.safeCooldown = true
-        local cooldown = math.random(Config.SafeMinCooldown * 60000, Config.SafeMaxCooldown * 60000)
-        local format = cooldown / 1000 / 60
-        local cooldownRound = math.floor(format)
-        DiscordLogs(
-            Strings.Logs.titles.cooldownA,
-            Strings.Logs.messages.cooldownSA ..cooldownRound .. ' ' ..Strings.Logs.messages.minutes,
-            Strings.Logs.colors.red
-        )
+        local cooldown = math.random(Config.Safes.cooldown.min, Config.Safes.cooldown.max) * minutes
+        local format = math.floor(cooldown / minutes)
+        if Logs.Types.cooldown.enabled then
+            local logData = {
+                link = Logs.Types.cooldown.webhook,
+                title = Strings.Logs.titles.cooldownA,
+                message = Strings.Logs.messages.cooldownSA ..format .. ' ' ..Strings.Logs.messages.minutes,
+                color = Strings.Logs.colors.red
+            }
+            DiscordLogs(logData)
+        end
         Wait(cooldown)
-        DiscordLogs(
-            Strings.Logs.titles.cooldownI,
-            Strings.Logs.messages.cooldownSI,
-            Strings.Logs.colors.green
-        )
+        if Logs.Types.cooldown.enabled then
+            local logData = {
+                link = Logs.Types.cooldown.webhook,
+                title = Strings.Logs.titles.cooldownI,
+                message = Strings.Logs.messages.cooldownSI,
+                color = Strings.Logs.colors.green
+            }
+            DiscordLogs(logData)
+        end
         GlobalState.safeCooldown = false
     end)
 end
@@ -55,12 +70,13 @@ end
 -- Function to check the players distance to registers/safes/etc
 --- @param source number
 local CheckPlayerDistance = function(source)
+    if not source then return false end
     local ped = GetPlayerPed(source)
     local playerPos = GetEntityCoords(ped)
     for _, locations in pairs(Config.Locations) do
         for _, location in pairs(locations) do
             local distance = #(playerPos - location)
-            if distance < 5 then
+            if distance < 10 then
                 return true
             end
         end
@@ -68,61 +84,60 @@ local CheckPlayerDistance = function(source)
     return false
 end
 
+-- Event to handle robbery completion
+--- @param source number
+--- @param type string
 RegisterNetEvent('lation_247robbery:RewardRobbery', function(source, type)
+    if not source or not type then return end
     local source = source
     local player = GetPlayer(source)
     if not player then return end
     local playerName = GetName(source)
     local identifier = GetIdentifier(source)
     local distance = CheckPlayerDistance(source)
-    local item, quantity, value
-    if distance then
-        if type == 'register' then
-            item = Config.RegisterRewardItem
-            quantity = Config.RegisterRewardQuantity
-            if Config.RegisterRewardRandom then
-                quantity = math.random(Config.RegisterRewardMinQuantity, Config.RegisterRewardMaxQuantity)
-            end
-            value = quantity
-            RegisterCooldown()
-        else
-            item = Config.SafeRewardItem
-            quantity = Config.SafeRewardQuantity
-            if Config.SafeRewardRandom then
-                quantity = math.random(Config.SafeRewardMinQuantity, Config.SafeRewardMaxQuantity)
-            end
-            value = quantity
-            SafeCooldown()
-        end
-        if Framework == 'qb' then
-            if Config.Metadata then
-                quantity = {worth = quantity}
-                value = quantity.worth
-            end
-        end
-        AddItem(source, item, quantity)
-        if Config.EnableLogs then
-            local robType = type:gsub("^%l", string.upper) -- Capitalizing string for logs
-            DiscordLogs(
-                '💰 ' ..robType.. ' ' ..Strings.Logs.titles.robbery,
-                Strings.Logs.labels.name ..playerName..
+    if not distance then return end
+    local item = type == 'register' and Config.Registers.reward.item or Config.Safes.reward.item
+    local quantity = (type == 'register') and math.random(Config.Registers.reward.min, Config.Registers.reward.max) or math.random(Config.Safes.reward.min, Config.Safes.reward.max)
+    if Config.Police.risk then
+        local policeCount = PlayersWithJob(Config.Police.jobs)
+        local increaseFactor = 1 + (policeCount * Config.Police.percent / 100)
+        quantity = quantity * increaseFactor
+    end
+    if type == 'register' then
+        RegisterCooldown()
+    else
+        SafeCooldown()
+    end
+    AddItem(source, item, quantity)
+    if Logs.Types.robbery.enabled then
+        local robType = type:gsub("^%l", string.upper)
+        local logData = {
+            link = Logs.Types.robbery.webhook,
+            title = '💰 ' ..robType.. ' ' ..Strings.Logs.titles.robbery,
+            message = Strings.Logs.labels.name ..playerName..
                 Strings.Logs.labels.id ..tostring(source)..
                 Strings.Logs.labels.identifier ..tostring(identifier)..
-                Strings.Logs.labels.message ..Strings.Logs.messages.robbery.. '$' ..GroupDigits(value).. ' ' ..item,
-                Strings.Logs.colors.green
-            )
-        end
+                Strings.Logs.labels.message ..Strings.Logs.messages.robbery.. '$' ..GroupDigits(quantity).. ' ' ..item,
+            color = Strings.Logs.colors.green
+        }
+        DiscordLogs(logData)
     end
 end)
 
 -- Function that gets the passed item & quantity and removes it
-RegisterNetEvent('lation_247robbery:RemoveItem', function(source, item, quantity)
+--- @param source number
+RegisterNetEvent('lation_247robbery:BreakLockpick', function(source)
+    if not source then return end
     local source = source
-    RemoveItem(source, item, quantity)
+    local player = GetPlayer(source)
+    if not player then return end
+    local distance = CheckPlayerDistance(source)
+    if not distance then return end
+    RemoveItem(source, Config.Registers.item, 1)
 end)
 
 -- Callback used to get police count
 lib.callback.register('lation_247robbery:getPoliceCount', function()
-    local policeCount = PlayersWithJob(Config.PoliceJobs)
-    return policeCount
+    local policeCount = PlayersWithJob(Config.Police.jobs)
+    return policeCount or 0
 end)

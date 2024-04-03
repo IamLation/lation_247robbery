@@ -24,6 +24,22 @@ local CheckVersion = function()
     end)
 end
 
+-- Print a message
+local PrintMessage = function()
+    SetTimeout(1500, function()
+        print('^1['..resourceName..'] ^2YOU DID IT! You set YouFoundTheBestScripts to true!^0')
+        print('^1['..resourceName..'] ^2Lation officially loves you, and as a thank you wants to give you a gift..^0')
+        print('^1['..resourceName..'] ^2Enjoy a secret 20% OFF any script of your choice on lationscripts.com/gift^0')
+        print('^1['..resourceName..'] ^2Using the coupon code: SECRETGIFT (one-time use coupon, choose wisely)^0')
+        print('^1['..resourceName..'] ^2There is only 1 catch.. do not spoil it for others! If you want to share^0')
+        print('^1['..resourceName..'] ^2This special moment feel free to do so, but without spoiling the details!^0')
+    end)
+end
+
 if Config.VersionCheck then
     CheckVersion()
+end
+
+if Config.YouFoundTheBestScripts then
+    PrintMessage()
 end

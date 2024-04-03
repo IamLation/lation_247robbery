@@ -1,6 +1,5 @@
 PlayerLoaded, PlayerData = nil, {}
-
-local invState = GetResourceState('ox_inventory')
+local ox_inv = GetResourceState('ox_inventory') == 'started'
 
 -- Get framework
 if GetResourceState('es_extended') == 'started' then
@@ -49,10 +48,14 @@ else
     -- Add support for a custom framework here
 end
 
--- Function to check if the player has the given items and amount
-HasItem = function(items)
-    if invState == 'started' then
-        if exports.ox_inventory:Search('count', items) >= 1 then
+-- Function that returns true or false if player has item
+--- @param item string
+--- @param amount number
+HasItem = function(item, amount)
+    if not item or not amount then return end
+    if ox_inv then
+        local count = exports.ox_inventory:Search('count', item)
+        if count >= amount then
             return true
         end
         return false
@@ -63,8 +66,11 @@ HasItem = function(items)
         end
         local inventory = ESX.GetPlayerData().inventory
         for _, itemData in pairs(inventory) do
-            if itemData.name == items and itemData.count >= 1 then
-                return true
+            if itemData.name == item then
+                local count = itemData.count or itemData.amount
+                if count >= amount then
+                    return true
+                end
             end
         end
         return false
@@ -73,10 +79,12 @@ HasItem = function(items)
         if not PlayerData or not PlayerData.items then
             return false
         end
-        for i = 1, #PlayerData.items do
-            local itemData = PlayerData.items[i]
-            if itemData and itemData.name == items and itemData.amount >= 1 then
-                return true
+        for _, itemData in pairs(PlayerData.items) do
+            if itemData and itemData.name == item then
+                local count = itemData.amount or itemData.count
+                if count >= amount then
+                    return true
+                end
             end
         end
         return false
