@@ -30,13 +30,13 @@ end
 --- @param data table data.coords & data.street
 PoliceDispatch = function(data)
     if Config.Police.dispatch == 'linden_outlawalert' then
-        local d = {displayCode = '10-88', description = 'Store Robbery', isImportant = 0, recipientList = Config.PoliceJobs, length = '10000', infoM = 'fa-info-circle', info = 'An alarm has been triggered at 24/7'}
+        local d = {displayCode = '10-88', description = 'Store Robbery', isImportant = 0, recipientList = Config.Police.jobs, length = '10000', infoM = 'fa-info-circle', info = 'An alarm has been triggered at 24/7'}
         local dispatchData = {dispatchData = d, caller = 'Citizen', coords = data.coords}
         TriggerServerEvent('wf-alerts:svNotify', dispatchData)
     elseif Config.Police.dispatch == 'cd_dispatch' then
         local data = exports['cd_dispatch']:GetPlayerInfo()
         TriggerServerEvent('cd_dispatch:AddNotification', {
-            job_table = Config.PoliceJobs,
+            job_table = Config.Police.jobs,
             coords = data.coords,
             title = '10-88 - Store Robbery',
             message = 'An alarm has been triggered at 24/7 on ' ..data.street,
@@ -58,7 +58,7 @@ PoliceDispatch = function(data)
     elseif Config.Police.dispatch == 'qs-dispatch' then
         local playerData = exports['qs-dispatch']:GetPlayerInfo()
         TriggerServerEvent('qs-dispatch:server:CreateDispatchCall', {
-            job = Config.PoliceJobs,
+            job = Config.Police.jobs,
             callLocation = playerData.coords,
             callCode = { code = '10-88', snippet = 'Store Robbery' },
             message = 'An alarm has been triggered at 24/7 on ' ..playerData.street_1,
