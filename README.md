@@ -1,6 +1,9 @@
 # Lation's 24/7 Robbery
 An engaging 24/7 robbery script for ESX, QBCore & QBox FiveM servers. Rob the registers, hack the computer for a security code & use that code to get access to the safe for even more money! Creating exciting quick-cash opportunities for your players is vital for any successful roleplay server! Includes cooldowns that restrict players from chain-robbing. If you fail hacking the computer too many times (configurable) you will fail the robbery and have to start over. If you try unlocking the safe unsuccessfully too many times (configurable) you will fail the robbery and have to start over. Every robbery will generate a new & unique "PIN" to unlock the safe. Furthermore, there is a small chance you can get lucky & find a note under the register that gives you the safe's PIN and allows you to skip hacking the computer at all - giving the criminals an edge and buying themselves some much needed time before the police arrive! The chance to find the note is configured and/or could be disabled entirely.
 
+## Preview
+[![lation 247robbery preview](http://img.youtube.com/vi/L5fWSR1G_mA/0.jpg)](https://www.youtube.com/watch?v=L5fWSR1G_mA)
+
 ## Support, Scripts & More
 - [Visit our Store](https://lationscripts.com/github)
 - [Join our Discord](https://discord.gg/9EbY4nM5uu)
@@ -30,6 +33,3 @@ An engaging 24/7 robbery script for ESX, QBCore & QBox FiveM servers. Rob the re
 - Ensure you have all dependencies above installed
 - Add lation_247robbery to your 'resources' directory
 - Add 'ensure lation_247robbery' in your 'server.cgf'
-
-## Preview (Outdated)
-[Streamable - Lation's 24/7 Robbery](https://streamable.com/xaaave)
