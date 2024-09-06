@@ -1,5 +1,5 @@
 # Lation's 24/7 Robbery
-An engaging 24/7 robbery script for ESX, QBCore & QBox FiveM servers. Rob the registers, hack the computer for a security code & use that code to get access to the safe for even more money! Creating exciting quick-cash opportunities for your players is vital for any successful roleplay server! Includes cooldowns that restrict players from chain-robbing. If you fail hacking the computer too many times (configurable) you will fail the robbery and have to start over. If you try unlocking the safe unsuccessfully too many times (configurable) you will fail the robbery and have to start over. Every robbery will generate a new & unique "PIN" to unlock the safe. Furthermore, there is a small chance you can get lucky & find a note under the register that gives you the safe's PIN and allows you to skip hacking the computer at all - giving the criminals an edge and buying themselves some much needed time before the police arrive! The chance to find the note is configured and/or could be disabled entirely.
+FiveM's most popular 24/7 store robbery script for ESX, QBCore & QBox servers!
 
 ## Preview
 [![lation 247robbery preview](http://img.youtube.com/vi/L5fWSR1G_mA/0.jpg)](https://www.youtube.com/watch?v=L5fWSR1G_mA)
@@ -10,26 +10,26 @@ An engaging 24/7 robbery script for ESX, QBCore & QBox FiveM servers. Rob the re
 
 ## Features
 - Supports ESX, QBCore & QBox
-- Customizable Discord webhook logging
-- Highly detailed config file
+- Supports FiveManage & Fivemerr logging services
+- Intuitive & easy-to-use config
 - Preconfigured for default 24/7 (Gabz 24/7 coords included)
 - Customize payouts to player (dirty money, cash, items, etc)
-- Require police presence in the city
-- Increase reward payout based on number of police in the city
-- Default support for cd_dispatch, ps-dispatch, qs-dispatch, linden_outlawalert & custom option
-- Default support for ox_lib, ESX, QBCore, okok, sd-notify notifications & custom option
-- Configurable cooldowns for registers & safes
+- Optionally require a police presence to start robbery
+- Increase reward payout based on number of police
+- Supports 9 different police dispatching scripts
+- Supports ox_lib, ESX, QBCore, okok, sd-notify, wasabi_notify & custom option
+- Configurable per-player cooldowns
 - Configurable max attempts at hacking and/or unlocking the safe
 - Customizable computer hack minigame (choose skillcheck or questionnaire)
 - If using questionnaire hack, ability to fully customize each question & answer
 - Ability to easily create unlimited questions if enabled
-- Easily customize skillcheck difficulty and inputs
+- Easily change skillcheck minigame to any minigame
 
 ## Dependencies
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
-- [ox_target](https://github.com/overextended/ox_target/releases), [qb-target](https://github.com/qbcore-framework/qb-target) or [qtarget](https://github.com/overextended/ox_target/releases)
+- [ox_target](https://github.com/overextended/ox_target/releases), [qb-target](https://github.com/qbcore-framework/qb-target) or [interact](https://github.com/darktrovx/interact)
 
 ## Installation
-- Ensure you have all dependencies above installed
-- Add lation_247robbery to your 'resources' directory
-- Add 'ensure lation_247robbery' in your 'server.cgf'
+- Install (or update) all dependencies listed above
+- Download & extract lation_247robbery into your 'resources' directory
+- Add 'ensure lation_247robbery' in your 'server.cfg' after all dependencies

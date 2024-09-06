@@ -1,5 +1,4 @@
 Config = {} -- Do not alter
-Config.Debug = false
 
 -- 🔎 Looking for more high quality scripts?
 -- 🛒 Shop Now: https://lationscripts.com/github
@@ -7,26 +6,43 @@ Config.Debug = false
 -- 😢 How dare you leave this option false?!
 Config.YouFoundTheBestScripts = false
 
--- Choose your target system
--- Available options are: 'ox_target', 'qb-target', 'qtarget' & 'custom'
--- custom' needs to be added to client/functions.lua
-Config.Target = 'ox_target'
+----------------------------------------------
+--        🛠️ Setup the basics below
+----------------------------------------------
 
--- Notification system, available options are: 'ox_lib', 'esx', 'qb', 'okok', 'sd-notify' & 'custom'
--- 'custom' needs to be added to client/functions.lua
-Config.Notify = 'ox_lib'
+Config.Setup = {
+    -- Use only if needed, directed by support or know what you're doing
+    -- Notice: enabling debug features will significantly increase resmon
+    -- And should always be disabled in production
+    debug = false,
+    -- Set your interaction system below
+    -- Available options are: 'ox_target', 'qb-target', 'interact' & 'custom'
+    -- 'custom' needs to be added to client/functions.lua
+    interact = 'ox_target',
+    -- Set your notification system below
+    -- Available options are: 'ox_lib', 'esx', 'qb', 'okok', 'sd-notify', 'wasabi_notify' & 'custom'
+    -- 'custom' needs to be added to client/functions.lua
+    notify = 'ox_lib',
+    -- Set your progress bar system below
+    -- Available options are: 'ox_lib', 'qbcore' & 'custom'
+    -- 'custom' needs to be added to client/functions.lua
+    -- Any custom progress bar must also support animations
+    progress = 'ox_lib',
+    -- Do you want to be notified via server console if an update is available?
+    -- True if yes, false if no
+    version = true,
+    -- 'metadata' is for QBCore users only
+    -- If true, the resource will reward metadata values for 'markedbills'
+    -- If false, the resource will reward the item without metadata, and just 1-to-1
+    metadata = true,
+    -- Once a store robbery has succesfully started a cooldown begins
+    -- This is per-player and not a global cooldown (cooldown is in seconds)
+    cooldown = 600,
+}
 
--- Select your ox_lib progress UI preference
--- Options are 'circle' and 'bar'
-Config.ProgressType = 'circle'
-
--- Do you want to be notified via server console if an update is available?
-Config.VersionCheck = true
-
--- Config.Metadata is for QBCore users only
--- If true, the resource will reward metadata values for 'markedbills' or similar item
--- If false, the resource will reward the item without metadata, and just 1-to-1
-Config.Metadata = true
+----------------------------------------------
+--        👮 Setup police options
+----------------------------------------------
 
 -- Manage all the police options here
 Config.Police = {
@@ -38,33 +54,38 @@ Config.Police = {
     -- Add your police job(s) below
     jobs = { 'police', 'sheriff' },
     -- Set your dispatch system
-    -- Available options: 'cd_dispatch', 'linden_outlawalert', 'ps-dispatch', 'qs-dispatch' and 'custom'
+    -- Available options: 'cd_dispatch', 'ps-dispatch', 'qs-dispatch'
+    -- 'core_dispatch', 'rcore_dispatch', aty_dispatch', 'op-dispatch',
+    -- 'origen_police', 'emergencydispatch' & 'custom' option
     dispatch = 'custom',
     -- Risk is a feature you can enable that will increase the players
     -- Reward payout based on the number of police online during the robbery!
     -- Do you want to enable the risk feature?
-    risk = false,
+    risk = true,
     -- If risk = true, percent is how much the reward payout increases
     -- In percentage for EVERY cop online. If percent = 10 and there are
     -- 3 police online, the reward payout will increase 30%
     percent = 10
 }
 
+----------------------------------------------
+--        🏪 Setup register robbery
+----------------------------------------------
+
 Config.Registers = {
     -- Set the required item name below needed to rob a cash register
     item = 'lockpick',
-    -- Once a register has been robbed, a cooldown starts to avoid chain-robbing.
-    -- Set the minimum and maximum cooldown times below - this is in minutes
-    -- Default cooldown is 10-20 minutes
-    cooldown = { min = 10, max = 20 },
-    -- Set the skillcheck difficulty levels below
-    -- You can set 'easy', 'medium' or 'hard' in any order
-    -- And in any amount/quantity - Learn more about the skillcheck
-    -- Here: https://overextended.dev/ox_lib/Modules/Interface/Client/skillcheck
-    difficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', },
-    -- The 'inputs' are the keys that will be used for the skillcheck
-    -- Minigame and can be set to any key or keys of your choice
-    inputs = { 'W', 'A', 'S', 'D' },
+    -- Customize the minigame (skillcheck) difficulty below
+    minigame = {
+        -- Set the skillcheck difficulty levels below
+        -- You can set 'easy', 'medium' or 'hard' in any order
+        -- And in any amount/quantity - Learn more about the skillcheck
+        -- Here: https://overextended.dev/ox_lib/Modules/Interface/Client/skillcheck
+        difficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', },
+        -- The 'inputs' are the keys that will be used for the skillcheck
+        -- Minigame and can be set to any key or keys of your choice
+        inputs = { 'W', 'A', 'S', 'D' }
+    },
     -- After a successful register robbery, what item do you want to reward
     -- And how much of it? Set the item = 'name' below and min/max quantites
     reward = { item = 'black_money', min = 1000, max = 1000 },
@@ -72,12 +93,16 @@ Config.Registers = {
     -- There is a chance that their lockpick will break. In percentage,
     -- What chance do you want their lockpick to break? To never break, set 0
     -- To break every time, set 100
-    breakChange = 50,
+    breakChance = 50,
     -- After a player succesfully robs a register, there is this "noteChance" they
     -- "Find" the safe's PIN "under the register" and can skip the computer hacking
     -- Step if found. In percentage, what chance do they have to find this note?
     noteChance = 10
 }
+
+----------------------------------------------
+--        🖥️ Setup computer hacking
+----------------------------------------------
 
 Config.Computers = {
     -- When a player is attempting to hack the computer how many
@@ -87,22 +112,24 @@ Config.Computers = {
     -- Do you want to enable the questionnaire hack? If true, this will replace
     -- The skillcheck hack with a series of questions the player must answer correctly
     questionnaire = false,
-    -- Set the skillcheck difficulty levels below (only used if questionnaire = false)
-    -- You can set 'easy', 'medium' or 'hard' in any order
-    -- And in any amount/quantity - Learn more about the skillcheck
-    -- Here: https://overextended.dev/ox_lib/Modules/Interface/Client/skillcheck
-    difficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', },
-    -- The 'inputs' are the keys that will be used for the skillcheck
-    -- Minigame and can be set to any key or keys of your choice
-    -- (only used if questionnaire = false)
-    inputs = { 'W', 'A', 'S', 'D' },
+    -- Customize the minigame (skillcheck) difficulty below
+    minigame = {
+        -- Set the skillcheck difficulty levels below
+        -- You can set 'easy', 'medium' or 'hard' in any order
+        -- And in any amount/quantity - Learn more about the skillcheck
+        -- Here: https://overextended.dev/ox_lib/Modules/Interface/Client/skillcheck
+        difficulty = { 'easy', 'easy', 'easy', 'easy', 'easy','easy', },
+        -- The 'inputs' are the keys that will be used for the skillcheck
+        -- Minigame and can be set to any key or keys of your choice
+        inputs = { 'W', 'A', 'S', 'D' }
+    },
 }
 
+----------------------------------------------
+--        🔐 Setup safe robbery
+----------------------------------------------
+
 Config.Safes = {
-    -- Once a safe has been robbed, a cooldown starts to avoid chain-robbing.
-    -- Set the minimum and maximum cooldown times below - this is in minutes
-    -- Default cooldown is 10-20 minutes
-    cooldown = { min = 10, max = 20 },
     -- When a player is attempting to hack the safe (inputting the PIN) how
     -- Many attempts do you want to allow? By default, after 3 failed attempts
     -- The robbery will end and not proceed (they will not be rewarded)
@@ -111,6 +138,10 @@ Config.Safes = {
     -- And how much of it? Set the item = 'name' below and min/max quantites
     reward = { item = 'black_money', min = 2000, max = 7000 },
 }
+
+----------------------------------------------
+--        ❓ Setup questionnaire
+----------------------------------------------
 
 -- Create, edit & manage all the questionnaire related options here if enabled
 -- You can create as many questions and answers as you wish
@@ -165,7 +196,10 @@ Config.Questionnaire = {
     }
 }
 
--- Manage all animations here
+----------------------------------------------
+--    💃 Customize animations and props
+----------------------------------------------
+
 Config.Animations = {
     lockpick = {
         animDict = 'missheistfbisetup1',

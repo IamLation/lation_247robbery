@@ -3,8 +3,8 @@ game 'gta5'
 lua54 'yes'
 
 author 'iamlation'
-description 'A 24/7 robbery script for FiveM'
-version '1.3.0'
+description 'FiveM\'s most popular 24/7 store robbery script'
+version '1.4.0'
 
 client_scripts {
     'bridge/client.lua',

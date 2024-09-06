@@ -2,8 +2,8 @@ Strings = {}
 
 Strings.Notify = {
     registerCooldown = 'Stores cannot be robbed this often - please wait and try again later',
-    notEnoughPolice = 'There is not enough Police available in the city to do this',
-    missingItem = 'You are missing a required tool to rob this register',
+    notEnoughPolice = 'There are not enough police in the city',
+    missingItem = 'I think this would be easier with a tool..',
     lockpickBroke = 'You broke the lockpick and failed to open the register',
     robberyCancel = 'You stop robbing the register',
     failedHack = 'You failed hacking into the computer',
@@ -31,12 +31,16 @@ Strings.Target = {
 Strings.AlertDialog = {
     noteFound = {
         header = '**Note Found**',
-        content = 'You found an interesting note under the register with nothing but the following numbers written on it: ',
+        content = 'You found an interesting note under the register with nothing but the following numbers written on it: %s',
+        centered = true,
+        cancel = false,
         labels = { cancel = 'Who Cares?', confirm = 'Got it!' }
     },
     hacked = {
         header = '**Code Exposed**',
-        content = 'You successfully hacked the computer and find the following code: ',
+        content = 'You successfully hacked the computer and find the following code: %s',
+        centered = true,
+        cancel = false,
         labels = { cancel = 'Cancel', confirm = 'Got it!' }
     }
 }
@@ -55,28 +59,12 @@ Strings.InputDialog = {
 }
 
 Strings.Logs = {
-    colors = {
-        green = 65280,
-        red = 16711680,
-        yellow = 16776960,
+    register_robbed = {
+        title = 'Register Robbed',
+        message = '%s (identifier: %s) has successfully robbed a register for $%s'
     },
-    labels = {
-        name = '**Player Name**: ',
-        id = '\n **Player ID**: ',
-        identifier = '\n **Identifier**: ',
-        message = '\n **Message**: '
-    },
-    titles = {
-        robbery = 'Robbery',
-        cooldownA = '🔒 Cooldown Active',
-        cooldownI = '🔓 Cooldown Inactive'
-    },
-    messages = {
-        minutes = 'minutes',
-        robbery = ' Has successfully completed a robbery and has received: ',
-        cooldownRA = 'The register cooldown is now active for ',
-        cooldownRI = 'The register cooldown is now inactive',
-        cooldownSA = 'The safe cooldown is now active for ',
-        cooldownSI = 'The safe cooldown is now inactive'
+    safe_robbed = {
+        title = 'Safe Robbed',
+        message = '%s (identifier: %s) has successfully robbed a safe for $%s'
     }
 }

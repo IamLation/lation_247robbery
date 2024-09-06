@@ -36,7 +36,7 @@ local PrintMessage = function()
     end)
 end
 
-if Config.VersionCheck then
+if Config.Setup.version then
     CheckVersion()
 end
 
