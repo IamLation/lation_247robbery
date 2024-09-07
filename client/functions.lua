@@ -14,6 +14,8 @@ ShowNotification = function(message, type)
         exports['sd-notify']:Notify('Convenience Store', message, type)
     elseif Config.Setup.notify == 'wasabi_notify' then
         exports.wasabi_notify:notify('Convenience Store', message, 5000, type, false, 'fas fa-store')
+    elseif Config.Setup.notify == 'mythic_notify' then
+        exports['mythic_notify']:DoHudText(type, message, 5000)
     elseif Config.Setup.notify == 'custom' then
         -- Add custom notification export/event here
     end
