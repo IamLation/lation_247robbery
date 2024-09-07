@@ -20,7 +20,7 @@ Config.Setup = {
     -- 'custom' needs to be added to client/functions.lua
     interact = 'ox_target',
     -- Set your notification system below
-    -- Available options are: 'ox_lib', 'esx', 'qb', 'okok', 'sd-notify', 'wasabi_notify' & 'custom'
+    -- Available options are: 'ox_lib', 'esx', 'qb', 'okok', 'sd-notify', 'wasabi_notify', 'mythic_notify' & 'custom'
     -- 'custom' needs to be added to client/functions.lua
     notify = 'ox_lib',
     -- Set your progress bar system below
