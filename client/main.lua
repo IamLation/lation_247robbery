@@ -2,10 +2,10 @@
 local activeRegister, activeComputer, activeSafe = false, false, false
 
 -- Initialize variables to store code & pin
-local generatedCode, safePin = nil, nil
+local safePin
 
 -- Initialize variables to track failed attempts
-local wrongPIN, failedHack = 0, 0
+local wrongPIN, failedHack = 1, 1
 
 -- Initialize table to build questionnaire if applicable
 local questionData = {}
@@ -69,10 +69,16 @@ local InitiateRegisterRobbery = function()
         local codeChance = math.random(100)
         if codeChance <= Config.Registers.noteChance then
             local alert = Strings.AlertDialog.noteFound
-            generatedCode = math.random(1111, 9999)
+            local generatedCode = math.random(1111, 9999)
+            if safePin then safePin = nil end
             safePin = generatedCode
-            alert.content = string.format(alert.content, generatedCode)
-            local note = lib.alertDialog(alert)
+            local note = lib.alertDialog({
+                header = alert.header,
+                content = string.format(alert.content, tostring(safePin)),
+                centered = true,
+                cancel = false,
+                labels = { confirm = alert.labels.confirm }
+            })
             if note == 'confirm' then
                 activeSafe = true
                 TriggerServerEvent('lation_247robbery:CompleteRegisterRobbery')
@@ -111,11 +117,17 @@ local InitiateComputerHack = function()
         if AreAnswersCorrect(questions) then
             failedHack = 0
             ClearPedTasks(cache.ped)
-            generatedCode = math.random(1111, 9999)
+            local generatedCode = math.random(1111, 9999)
+            if safePin then safePin = nil end
             safePin = generatedCode
             local alert = Strings.AlertDialog.hacked
-            alert.content = string.format(alert.content, generatedCode)
-            lib.alertDialog(alert)
+            lib.alertDialog({
+                header = alert.header,
+                content = string.format(alert.content, tostring(safePin)),
+                centered = true,
+                cancel = false,
+                labels = { confirm = alert.labels.confirm }
+            })
             activeSafe = true
         else
             ClearPedTasks(cache.ped)
@@ -134,11 +146,17 @@ local InitiateComputerHack = function()
         end
         failedHack = 0
         ClearPedTasks(cache.ped)
-        generatedCode = math.random(1111, 9999)
+        local generatedCode = math.random(1111, 9999)
+        if safePin then safePin = nil end
         safePin = generatedCode
         local alert = Strings.AlertDialog.hacked
-        alert.content = string.format(alert.content, generatedCode)
-        lib.alertDialog(alert)
+        lib.alertDialog({
+            header = alert.header,
+            content = string.format(alert.content, tostring(safePin)),
+            centered = true,
+            cancel = false,
+            labels = { confirm = alert.labels.confirm }
+        })
         activeSafe = true
     end
 end
@@ -166,6 +184,7 @@ local InitiateSafeRobbery = function()
         if ProgressBar(Config.Animations.safe) then
             activeRegister = false
             TriggerServerEvent('lation_247robbery:CompleteSafeRobbery')
+            safePin = nil
         else
             activeSafe = true
         end
