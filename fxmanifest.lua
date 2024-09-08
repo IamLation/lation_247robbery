@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'iamlation'
 description 'FiveM\'s most popular 24/7 store robbery script'
-version '1.4.0'
+version '1.4.1'
 
 client_scripts {
     'bridge/client.lua',
