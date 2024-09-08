@@ -231,8 +231,36 @@ Config.Animations = {
     }
 }
 
+Config.Blip = {
+    BlipName = "Shop Robbery",
+    Enable = false,
+    Options = {
+        Sprite = 156,
+        Color = 0,
+        Scale = 0.9,
+        Display = 4
+    }
+}
+
 -- Store configs
 Config.Locations = {
+    Blips ={
+        {coords=vec3(24.9456, -1344.9544, 29.6116), enableblip=true}, -- Innocence Blvd
+        {coords=vec3(-3041.3566, 584.2665, 8.0235), enableblip=true}, -- Inseno Road
+        {coords=vec3(-3244.5734, 1000.6577, 12.9453), enableblip=true},-- Barbareno Road
+        {coords=vec3(1729.3294, 6417.1230, 35.1519), enableblip=true},-- Great Ocean Highway
+        {coords=vec3(1698.3787, 4923.2553, 42.2410), enableblip=true},-- Grape Seed Main Street
+        {coords=vec3(1959.3229, 3742.2895, 32.4584), enableblip=true},-- Alhambra Drive
+        {coords=vec3(548.9014, 2668.9414, 42.2711), enableblip=true},-- Route 68
+        {coords=vec3(2676.2124, 3280.9694, 55.3558), enableblip=true},-- Senora Freeway
+        {coords=vec3(2554.875, 381.3857, 108.7376), enableblip=true},-- Palomino Freeway
+        {coords=vec3(373.5953, 328.5891, 103.6810), enableblip=true},-- Clinton Avenue
+        {coords=vec3(-1820.5584, 793.9172, 138.2765), enableblip=true}, -- North Rockford Drive
+        {coords=vec3(-47.2251, -1757.5423, 29.5983), enableblip=true},-- Grove Street
+        {coords=vec3(-706.7102, -913.5667, 19.3929), enableblip=true},-- Ginger Street
+        {coords=vec3(1164.1452, -322.7899, 69.3824), enableblip=true},-- Mirror Park Blvd
+
+    },
     Registers = {
         vec3(24.9456, -1344.9544, 29.6116), -- Innocence Blvd
         vec3(-3041.3566, 584.2665, 8.0235), -- Inseno Road

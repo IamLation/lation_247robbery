@@ -191,6 +191,26 @@ local InitiateSafeRobbery = function()
     end
 end
 
+CreateThread(function()
+    if Config.Blip.Enable then
+        for key, location in pairs(Config.Locations.Blips) do
+            if location.enableblip then
+                local blip = AddBlipForCoord(location.coords)
+
+                SetBlipSprite(blip, Config.Blip.Options.Sprite)
+                SetBlipDisplay(blip, Config.Blip.Options.Display)
+                SetBlipScale(blip, Config.Blip.Options.Scale)
+                SetBlipColour(blip, Config.Blip.Options.Color)
+                SetBlipAsShortRange(blip, true)
+
+                BeginTextCommandSetBlipName("STRING")
+                AddTextComponentString(Config.Blip.BlipName)
+                EndTextCommandSetBlipName(blip)
+            end
+        end
+    end
+end)
+
 -- Create all the targets for the cash registers
 for key, coords in pairs(Config.Locations.Registers) do
     local data = {
