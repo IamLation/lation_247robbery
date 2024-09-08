@@ -32,16 +32,12 @@ Strings.AlertDialog = {
     noteFound = {
         header = '**Note Found**',
         content = 'You found an interesting note under the register with nothing but the following numbers written on it: %s',
-        centered = true,
-        cancel = false,
-        labels = { cancel = 'Who Cares?', confirm = 'Got it!' }
+        labels = { confirm = 'Got it!' }
     },
     hacked = {
         header = '**Code Exposed**',
         content = 'You successfully hacked the computer and find the following code: %s',
-        centered = true,
-        cancel = false,
-        labels = { cancel = 'Cancel', confirm = 'Got it!' }
+        labels = { confirm = 'Got it!' }
     }
 }
 
