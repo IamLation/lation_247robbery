@@ -5,7 +5,7 @@ FiveM's most popular 24/7 store robbery script for ESX, QBCore & QBox servers!
 [![lation 247robbery preview](http://img.youtube.com/vi/L5fWSR1G_mA/0.jpg)](https://www.youtube.com/watch?v=L5fWSR1G_mA)
 
 ## Support, Scripts & More
-- [Visit our Store](https://lationscripts.com/github)
+- [Visit our Store](https://lationscripts.com?utm_source=github&utm_medium=free-script)
 - [Join our Discord](https://discord.gg/9EbY4nM5uu)
 
 ## Features
