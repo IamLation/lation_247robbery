@@ -1,3 +1,7 @@
+-- Initialize global state for cooldowns
+GlobalState.cooldown = false
+GlobalState.started = false
+
 -- Initialize table to store known locations & robbery states
 local locations, states = {}, {}
 
@@ -39,6 +43,11 @@ end
 local CanPlayerRob = function(identifier)
     if not identifier then return false end
     local currentTime = os.time()
+    if Config.Setup.global.enable then
+        if GlobalState.cooldown or GlobalState.started then
+            return false
+        end
+    end
     if not states[identifier] then return true end
     local lastCompleted = states[identifier].completed
     if lastCompleted then
@@ -47,6 +56,15 @@ local CanPlayerRob = function(identifier)
         end
     end
     return true
+end
+
+-- Starts & ends global cooldown if enabled
+local StartCooldown = function()
+    GlobalState.cooldown = true
+    local wait = math.floor(Config.Setup.global.duration * 1000)
+    SetTimeout(wait, function()
+        GlobalState.cooldown = false
+    end)
 end
 
 -- Callback to initialize store robbery
@@ -83,9 +101,10 @@ lib.callback.register('lation_247robbery:StartRobbery', function(source)
     end
     if not CanPlayerRob(identifier) then
         TriggerClientEvent('lation_247robbery:Notify', source, Strings.Notify.registerCooldown, 'error')
-        EventLog('[main.lua]: lation_247robbery:StartRobbery: cooldown is still active for player', 'error')
+        EventLog('[main.lua]: lation_247robbery:StartRobbery: cooldown is still active (for player or global)', 'error')
         return false
     end
+    GlobalState.started = true
     if not states[identifier] then states[identifier] = {} end
     states[identifier].state = 'in_progress'
     states[identifier].started = os.time()
@@ -93,6 +112,9 @@ lib.callback.register('lation_247robbery:StartRobbery', function(source)
     SetTimeout(600000, function() -- 10 minutes timeout
         if states[identifier] and states[identifier].state == 'in_progress' then
             states[identifier] = nil
+        end
+        if GlobalState.started then
+            GlobalState.started = false
         end
     end)
     return true
@@ -142,6 +164,10 @@ RegisterNetEvent('lation_247robbery:CompleteRegisterRobbery', function()
         return
     end
     if not states[identifier] or states[identifier].state ~= 'in_progress' then
+        EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: robbery wasnt initiated for player', 'error')
+        return
+    end
+    if not GlobalState.started then
         EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: robbery wasnt initiated for player', 'error')
         return
     end
@@ -207,9 +233,11 @@ RegisterNetEvent('lation_247robbery:CompleteSafeRobbery', function()
         local increase = 1 + (police * Config.Police.percent / 100)
         quantity = math.floor(quantity * increase)
     end
+    GlobalState.started = false
     states[identifier].state = nil
     states[identifier].completed = os.time()
     AddItem(source, data.item, quantity)
+    StartCooldown()
     if Logs.Events.safe_robbed then
         local log = Strings.Logs.safe_robbed.message
         local message = string.format(log, tostring(name), tostring(identifier), tostring(GroupDigits(quantity)))

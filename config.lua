@@ -38,6 +38,11 @@ Config.Setup = {
     -- Once a store robbery has succesfully started a cooldown begins
     -- This is per-player and not a global cooldown (cooldown is in seconds)
     cooldown = 600,
+    -- By default, the player-based cooldowns are overridden by this global cooldown
+    -- This will prevent robberies at all stores by any player until the cooldown expires
+    -- If you prefer a more flexible player-based cooldown option, just disable global
+    -- The duration variable here is also in seconds like above
+    global = { enable = true, duration = 600 }
 }
 
 ----------------------------------------------
