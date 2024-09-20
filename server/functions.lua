@@ -14,7 +14,7 @@ EventLog = function(message, type)
         if not fmlogs then return end
         exports['fm-logs']:createLog({
             LogType = 'Resource',
-            Resource = 'lation_meth',
+            Resource = 'lation_247robbery',
             Level = type or 'info',
             Message = message,
         })
@@ -43,7 +43,7 @@ PlayerLog = function(source, title, message)
         exports['fm-logs']:createLog({
             LogType = 'Player',
             Message = message,
-            Resource = 'lation_meth',
+            Resource = 'lation_247robbery',
             Source = source,
         }, { Screenshot = Logs.Screenshots })
     elseif Logs.Service == 'discord' then

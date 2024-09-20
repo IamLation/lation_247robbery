@@ -13,7 +13,7 @@ InitializeFramework = function()
         RegisterNetEvent('esx:playerLoaded', function(xPlayer)
             PlayerData = xPlayer
             PlayerLoaded = true
-            TriggerEvent('lation_meth:onPlayerLoaded')
+            TriggerEvent('lation_247robbery:onPlayerLoaded')
         end)
 
         RegisterNetEvent('esx:onPlayerLogout', function()
@@ -25,7 +25,7 @@ InitializeFramework = function()
             if GetCurrentResourceName() ~= resourceName or not ESX.PlayerLoaded then return end
             PlayerData = GetPlayerData()
             PlayerLoaded = true
-            TriggerEvent('lation_meth:onPlayerLoaded')
+            TriggerEvent('lation_247robbery:onPlayerLoaded')
         end)
 
     elseif GetResourceState('qbx_core') == 'started' then
@@ -34,7 +34,7 @@ InitializeFramework = function()
         AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
             PlayerData = GetPlayerData()
             PlayerLoaded = true
-            TriggerEvent('lation_meth:onPlayerLoaded')
+            TriggerEvent('lation_247robbery:onPlayerLoaded')
         end)
 
         RegisterNetEvent('qbx_core:client:playerLoggedOut', function()
@@ -46,7 +46,7 @@ InitializeFramework = function()
             if GetCurrentResourceName() ~= resourceName then return end
             PlayerData = GetPlayerData()
             PlayerLoaded = true
-            TriggerEvent('lation_meth:onPlayerLoaded')
+            TriggerEvent('lation_247robbery:onPlayerLoaded')
         end)
     elseif GetResourceState('qb-core') == 'started' then
         QBCore = exports['qb-core']:GetCoreObject()
@@ -55,7 +55,7 @@ InitializeFramework = function()
         AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
             PlayerData = GetPlayerData()
             PlayerLoaded = true
-            TriggerEvent('lation_meth:onPlayerLoaded')
+            TriggerEvent('lation_247robbery:onPlayerLoaded')
         end)
 
         RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
@@ -67,7 +67,7 @@ InitializeFramework = function()
             if GetCurrentResourceName() ~= resourceName or not LocalPlayer.state.isLoggedIn then return end
             PlayerData = GetPlayerData()
             PlayerLoaded = true
-            TriggerEvent('lation_meth:onPlayerLoaded')
+            TriggerEvent('lation_247robbery:onPlayerLoaded')
         end)
     else
         -- Add custom framework here
