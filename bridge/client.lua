@@ -5,7 +5,7 @@ Framework, Inventory = nil, nil
 PlayerLoaded, PlayerData = nil, {}
 
 -- Get framework
-InitializeFramework = function()
+local function InitializeFramework()
     if GetResourceState('es_extended') == 'started' then
         ESX = exports['es_extended']:getSharedObject()
         Framework = 'esx'
@@ -75,7 +75,7 @@ InitializeFramework = function()
 end
 
 -- Get inventory
-InitializeInventory = function()
+local function InitializeInventory()
     if GetResourceState('ox_inventory') == 'started' then
         Inventory = 'ox_inventory'
     elseif GetResourceState('qb-inventory') == 'started' then
@@ -96,7 +96,7 @@ InitializeInventory = function()
 end
 
 -- Returns player data
-GetPlayerData = function()
+function GetPlayerData()
     if Framework == 'esx' then
         return ESX.GetPlayerData()
     elseif Framework == 'qb' then
@@ -112,7 +112,7 @@ end
 --- @param item string
 --- @param amount number
 --- @return boolean
-HasItem = function(item, amount)
+function HasItem(item, amount)
     if not item or not amount then return false end
     if Inventory then
         if Inventory == 'ox_inventory' then

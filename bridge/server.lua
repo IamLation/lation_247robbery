@@ -2,7 +2,7 @@
 Framework, Inventory = nil, nil
 
 -- Get framework
-InitializeFramework = function()
+local function InitializeFramework()
     if GetResourceState('es_extended') == 'started' then
         ESX = exports['es_extended']:getSharedObject()
         Framework = 'esx'
@@ -17,7 +17,7 @@ InitializeFramework = function()
 end
 
 -- Get inventory
-InitializeInventory = function()
+local function InitializeInventory()
     if GetResourceState('ox_inventory') == 'started' then
         Inventory = 'ox_inventory'
     elseif GetResourceState('qb-inventory') == 'started' then
@@ -39,7 +39,7 @@ end
 
 -- Get player from source
 --- @param source number Player ID
-GetPlayer = function(source)
+function GetPlayer(source)
     if not source then return end
     if Framework == 'esx' then
         return ESX.GetPlayerFromId(source)
@@ -54,7 +54,7 @@ end
 
 -- Function to get a player identifier by source
 --- @param source number Player ID
-GetIdentifier = function(source)
+function GetIdentifier(source)
     local player = GetPlayer(source)
     if not player then return end
     if Framework == 'esx' then
@@ -69,7 +69,7 @@ end
 -- Function to get a player's name
 --- @param source number Player ID
 --- @return string
-GetName = function(source)
+function GetName(source)
     local player = GetPlayer(source)
     if not player then return 'Unknown' end
     if Framework == 'esx' then
@@ -84,7 +84,7 @@ end
 
 -- Returns number of players with police job(s)
 --- @return number
-GetPoliceCount = function()
+function GetPoliceCount()
     local count, jobs = 0, {}
     for _, job in pairs(Config.Police.jobs) do
         jobs[job] = true
@@ -116,7 +116,7 @@ end
 --- @param source number Player ID
 --- @param item string Item to search
 --- @return number
-GetItemCount = function(source, item)
+function GetItemCount(source, item)
     if not source or not item then return 0 end
     local player = GetPlayer(source)
     if not player then return 0 end
@@ -144,13 +144,46 @@ GetItemCount = function(source, item)
     return 0
 end
 
+-- Returns correct framework money type if needed
+--- @param type string Money type
+--- @return string
+local function ConvertMoneyType(type)
+    if type == 'money' and (Framework == 'qb' or Framework == 'qbx') then
+        type = 'cash'
+    elseif type == 'cash' and Framework == 'esx' then
+        type = 'money'
+    else
+        -- Add custom framework here
+    end
+    return type
+end
+
+-- Add money to players account
+--- @param source number Player ID
+--- @param type string Account to add to
+--- @param amount number Amount to add
+function AddMoney(source, type, amount)
+    local player = GetPlayer(source)
+    if not player then return end
+    if Framework == 'esx' then
+        player.addAccountMoney(ConvertMoneyType(type), amount)
+    elseif Framework == 'qb' or Framework == 'qbx' then
+        player.Functions.AddMoney(ConvertMoneyType(type), amount)
+    else
+        -- Add custom framework here
+    end
+end
+
 -- Adds an item to players inventory
 --- @param source number Player ID
 --- @param item string Item to add
 --- @param count number Quantity to add
-AddItem = function(source, item, count)
+function AddItem(source, item, count)
     local player = GetPlayer(source)
     if not player then return end
+    if item == 'cash' or item == 'money' or item == 'bank' then
+        return AddMoney(source, item, count)
+    end
     if Inventory then
         if Inventory == 'ox_inventory' then
             exports[Inventory]:AddItem(source, item, count)
@@ -180,7 +213,7 @@ end
 --- @param source number Player ID
 --- @param item string Item to remove
 --- @param count number Quantity to remove
-RemoveItem = function(source, item, count)
+function RemoveItem(source, item, count)
     local player = GetPlayer(source)
     if not player then return end
     if Inventory then
