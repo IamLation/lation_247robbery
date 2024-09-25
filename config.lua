@@ -93,6 +93,7 @@ Config.Registers = {
     },
     -- After a successful register robbery, what item do you want to reward
     -- And how much of it? Set the item = 'name' below and min/max quantites
+    -- (this can also can be account, such as: 'cash', 'money' or 'bank')
     reward = { item = 'black_money', min = 1000, max = 1000 },
     -- If a player fails to successfully lockpick the register
     -- There is a chance that their lockpick will break. In percentage,
@@ -141,6 +142,7 @@ Config.Safes = {
     maxAttempts = 3,
     -- After a successful safe robbery, what item do you want to reward
     -- And how much of it? Set the item = 'name' below and min/max quantites
+    -- (this can also can be account, such as: 'cash', 'money' or 'bank')
     reward = { item = 'black_money', min = 2000, max = 7000 },
 }
 
