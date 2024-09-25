@@ -28,7 +28,7 @@ end
 
 -- Used to check if the answers submitted are correct
 --- @param submittedAnswers table
-local AreAnswersCorrect = function(submittedAnswers)
+local function AreAnswersCorrect(submittedAnswers)
     for questionIndex, correctAnswer in ipairs(Config.Questionnaire.answers) do
         local submittedAnswer = submittedAnswers[questionIndex]
         if Config.Questionnaire.questions[questionIndex].type == 'select' then
@@ -45,7 +45,7 @@ local AreAnswersCorrect = function(submittedAnswers)
 end
 
 -- Function to start the initial robbery process
-local InitiateRegisterRobbery = function()
+local function InitiateRegisterRobbery()
     local canStart = lib.callback.await('lation_247robbery:StartRobbery', false)
     if not canStart then activeRegister = false return end
     local dict, anim = Config.Animations.lockpick.animDict, Config.Animations.lockpick.animClip
@@ -94,13 +94,14 @@ local InitiateRegisterRobbery = function()
 end
 
 -- Function to handle hacking the computer if required
-local InitiateComputerHack = function()
+local function InitiateComputerHack()
     activeComputer = false -- Deactive target
     if failedHack > Config.Computers.maxAttempts then
         activeRegister = false
         activeComputer = false
         failedHack = 0
         ShowNotification(Strings.Notify.tooManyHackFails, 'error')
+        TriggerServerEvent('lation_247robbery:FailedRobbery')
         return
     end
     local dict, anim = Config.Animations.hackPC.animDict, Config.Animations.hackPC.animClip
@@ -162,13 +163,14 @@ local InitiateComputerHack = function()
 end
 
 -- Function to handle the safe robbery
-local InitiateSafeRobbery = function()
+local function InitiateSafeRobbery()
     activeSafe = false
     if wrongPIN > Config.Safes.maxAttempts then
         activeRegister = false
         activeSafe = false
         wrongPIN = 0
         ShowNotification(Strings.Notify.tooManySafeFails, 'error')
+        TriggerServerEvent('lation_247robbery:FailedRobbery')
         return
     end
     local inputCode = lib.inputDialog(Strings.InputDialog.safeHeader, {Strings.InputDialog.safe})

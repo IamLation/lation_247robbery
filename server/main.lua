@@ -7,13 +7,13 @@ local locations, states = {}, {}
 
 -- Function used to make numbers prettier (Credits to ESX for the function)
 --- @param value number
-local GroupDigits = function(value)
+local function GroupDigits(value)
 	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
 	return left .. (num:reverse():gsub('(%d%d%d)', '%1,'):reverse()) .. right
 end
 
 -- Builds local table containing all locations categorized
-local InitializeStores = function ()
+local function InitializeStores()
     for type, coords in pairs(Config.Locations) do
         for _, location in pairs(coords) do
             if not locations[type:lower()] then locations[type:lower()] = {} end
@@ -26,7 +26,7 @@ end
 --- @param source number
 --- @param location string registers, computers, safes
 --- @return boolean
-local IsPlayerNearby = function(source, location)
+local function IsPlayerNearby(source, location)
     if not source or not location then return false end
     local playerPos = GetEntityCoords(GetPlayerPed(source))
     for _, coords in pairs(locations[location]) do
@@ -40,7 +40,7 @@ end
 -- Returns boolean if player can start robbery
 --- @param identifier string
 --- @return boolean
-local CanPlayerRob = function(identifier)
+local function CanPlayerRob(identifier)
     if not identifier then return false end
     local currentTime = os.time()
     if Config.Setup.global.enable then
@@ -59,7 +59,7 @@ local CanPlayerRob = function(identifier)
 end
 
 -- Starts & ends global cooldown if enabled
-local StartCooldown = function()
+local function StartCooldown()
     GlobalState.cooldown = true
     local wait = math.floor(Config.Setup.global.duration * 1000)
     SetTimeout(wait, function()
@@ -75,6 +75,7 @@ lib.callback.register('lation_247robbery:StartRobbery', function(source)
         EventLog('[main.lua]: lation_247robbery:StartRobbery: unable to retrieve source', 'error')
         return false
     end
+    local source = source
     local identifier = GetIdentifier(source)
     if not identifier then
         EventLog('[main.lua]: lation_247robbery:StartRobbery: unable to retrieve player identifier', 'error')
@@ -109,7 +110,7 @@ lib.callback.register('lation_247robbery:StartRobbery', function(source)
     states[identifier].state = 'in_progress'
     states[identifier].started = os.time()
     -- Fallback to reset states if not completed in a reasonable amount of time
-    SetTimeout(600000, function() -- 10 minutes timeout
+    SetTimeout(600000, function() -- 10 minute timeout
         if states[identifier] and states[identifier].state == 'in_progress' then
             states[identifier] = nil
         end
@@ -126,9 +127,14 @@ RegisterNetEvent('lation_247robbery:DoesLockpickBreak', function()
         EventLog('[main.lua]: lation_247robbery:DoesLockpickBreak: unable to retrieve source', 'error')
         return
     end
+    local source = source
     local identifier = GetIdentifier(source)
     if not identifier then
         EventLog('[main.lua]: lation_247robbery:DoesLockpickBreak: unable to retrieve player identifier', 'error')
+        return
+    end
+    if not GlobalState.started then
+        EventLog('[main.lua]: lation_247robbery:RegisterIncomplete: global state wasnt initiated', 'error')
         return
     end
     if not states[identifier] or states[identifier].state ~= 'in_progress' then
@@ -144,6 +150,7 @@ RegisterNetEvent('lation_247robbery:DoesLockpickBreak', function()
         RemoveItem(source, Config.Registers.item, 1)
         TriggerClientEvent('lation_247robbery:Notify', source, Strings.Notify.lockpickBroke, 'error')
     end
+    if GlobalState.started then GlobalState.started = false end
 end)
 
 -- Event to handle robbery completion and rewards
@@ -168,7 +175,7 @@ RegisterNetEvent('lation_247robbery:CompleteRegisterRobbery', function()
         return
     end
     if not GlobalState.started then
-        EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: robbery wasnt initiated for player', 'error')
+        EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: global state wasnt initiated', 'error')
         return
     end
     local isNearRegister = IsPlayerNearby(source, 'registers')
@@ -203,6 +210,7 @@ RegisterNetEvent('lation_247robbery:CompleteSafeRobbery', function()
         EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: unable to retrieve source', 'error')
         return
     end
+    local source = source
     local identifier = GetIdentifier(source)
     if not identifier then
         EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: unable to retrieve player identifier', 'error')
@@ -211,6 +219,10 @@ RegisterNetEvent('lation_247robbery:CompleteSafeRobbery', function()
     local name = GetName(source)
     if not name then
         EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: unable to retrieve player name', 'error')
+        return
+    end
+    if not GlobalState.started then
+        EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: global state wasnt initiated', 'error')
         return
     end
     if not states[identifier] or states[identifier].state ~= 'completed' then
@@ -243,6 +255,42 @@ RegisterNetEvent('lation_247robbery:CompleteSafeRobbery', function()
         local message = string.format(log, tostring(name), tostring(identifier), tostring(GroupDigits(quantity)))
         PlayerLog(source, Strings.Logs.safe_robbed.title, message)
     end
+end)
+
+-- Event to handle failed robbery
+RegisterNetEvent('lation_247robbery:FailedRobbery', function()
+    if not source then
+        EventLog('[main.lua]: lation_247robbery:FailedRobbery: unable to retrieve source', 'error')
+        return
+    end
+    local source = source
+    local identifier = GetIdentifier(source)
+    if not identifier then
+        EventLog('[main.lua]: lation_247robbery:FailedRobbery: unable to retrieve player identifier', 'error')
+        return
+    end
+    local name = GetName(source)
+    if not name then
+        EventLog('[main.lua]: lation_247robbery:FailedRobbery: unable to retrieve player name', 'error')
+        return
+    end
+    if not GlobalState.started then
+        EventLog('[main.lua]: lation_247robbery:FailedRobbery: global state wasnt initiated', 'error')
+        return
+    end
+    if not states[identifier] or states[identifier].state ~= 'completed' then
+        EventLog('[main.lua]: lation_247robbery:FailedRobbery: robbery wasnt initiated for player', 'error')
+        return
+    end
+    local isNearRegister = IsPlayerNearby(source, 'computers')
+    if not isNearRegister then
+        EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: player not nearby any registers', 'error')
+        return
+    end
+    GlobalState.started = false
+    states[identifier].state = nil
+    states[identifier].completed = os.time()
+    StartCooldown()
 end)
 
 -- Populate local table with categorized coords
