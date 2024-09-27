@@ -1,7 +1,7 @@
 Config = {} -- Do not alter
 
 -- 🔎 Looking for more high quality scripts?
--- 🛒 Shop Now: https://lationscripts.com/github
+-- 🛒 Shop Now: https://lationscripts.com
 -- 💬 Join Discord: https://discord.gg/9EbY4nM5uu
 -- 😢 How dare you leave this option false?!
 Config.YouFoundTheBestScripts = false
