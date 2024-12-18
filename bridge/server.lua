@@ -1,6 +1,9 @@
 -- Initialize global variables to store framework & inventory
 Framework, Inventory = nil, nil
 
+-- Initialize config(s)
+local sh_config = require 'config.shared'
+
 -- Get framework
 local function InitializeFramework()
     if GetResourceState('es_extended') == 'started' then
@@ -11,6 +14,9 @@ local function InitializeFramework()
     elseif GetResourceState('qb-core') == 'started' then
         QBCore = exports['qb-core']:GetCoreObject()
         Framework = 'qb'
+    elseif GetResourceState('ox_core') == 'started' then
+        Ox = require '@ox_core.lib.init'
+        Framework = 'ox'
     else
         -- Add custom framework here
     end
@@ -26,12 +32,12 @@ local function InitializeInventory()
         Inventory = 'qs-inventory'
     elseif GetResourceState('ps-inventory') == 'started' then
         Inventory = 'ps-inventory'
-    elseif GetResourceState('lj-inventory') == 'started' then
-        Inventory = 'lj-inventory'
     elseif GetResourceState('origen_inventory') == 'started' then
         Inventory = 'origen_inventory'
     elseif GetResourceState('codem-inventory') == 'started' then
         Inventory = 'codem-inventory'
+    elseif GetResourceState('core_inventory') == 'started' then
+        Inventory = 'core_inventory'
     else
         -- Add custom inventory here
     end
@@ -47,6 +53,8 @@ function GetPlayer(source)
         return QBCore.Functions.GetPlayer(source)
     elseif Framework == 'qbx' then
         return exports.qbx_core:GetPlayer(source)
+    elseif Framework == 'ox' then
+        return Ox.GetPlayer(source)
     else
         -- Add custom framework here
     end
@@ -61,6 +69,8 @@ function GetIdentifier(source)
         return player.identifier
     elseif Framework == 'qb' or Framework == 'qbx' then
         return player.PlayerData.citizenid
+    elseif Framework == 'ox' then
+        return player.stateId
     else
         -- Add custom framework here
     end
@@ -75,7 +85,9 @@ function GetName(source)
     if Framework == 'esx' then
         return player.getName()
     elseif Framework == 'qb' or Framework == 'qbx' then
-        return player.PlayerData.charinfo.firstname .. ' ' .. player.PlayerData.charinfo.lastname
+        return player.PlayerData.charinfo.firstname.. ' ' ..player.PlayerData.charinfo.lastname
+    elseif Framework == 'ox' then
+        return player.get('firstName').. ' ' ..player.get('lastName')
     else
         -- Add custom framework here
     end
@@ -86,7 +98,7 @@ end
 --- @return number
 function GetPoliceCount()
     local count, jobs = 0, {}
-    for _, job in pairs(Config.Police.jobs) do
+    for _, job in pairs(sh_config.police.jobs) do
         jobs[job] = true
     end
     if Framework == 'esx' then
@@ -104,7 +116,13 @@ function GetPoliceCount()
         end
     elseif Framework == 'qbx' then
         for job, _ in pairs(jobs) do
-            count = count + exports.qbx_core:GetDutyCountJob(job)
+            count += exports.qbx_core:GetDutyCountJob(job)
+        end
+    elseif Framework == 'ox' then
+        for _, player in pairs(Ox.GetPlayers()) do
+            if jobs[player.getGroupByType('job')] then
+                count += 1
+            end
         end
     else
         -- Add custom framework here
@@ -123,6 +141,8 @@ function GetItemCount(source, item)
     if Inventory then
         if Inventory == 'ox_inventory' then
             return exports[Inventory]:Search(source, 'count', item) or 0
+        elseif Inventory == 'core_inventory' then
+            return exports[Inventory]:getItemCount(source, item)
         else
             local itemData = exports[Inventory]:GetItemByName(source, item)
             if not itemData then return 0 end
@@ -150,7 +170,7 @@ end
 local function ConvertMoneyType(type)
     if type == 'money' and (Framework == 'qb' or Framework == 'qbx') then
         type = 'cash'
-    elseif type == 'cash' and Framework == 'esx' then
+    elseif type == 'cash' and (Framework == 'esx' or Framework == 'ox') then
         type = 'money'
     else
         -- Add custom framework here
@@ -169,6 +189,13 @@ function AddMoney(source, type, amount)
         player.addAccountMoney(ConvertMoneyType(type), amount)
     elseif Framework == 'qb' or Framework == 'qbx' then
         player.Functions.AddMoney(ConvertMoneyType(type), amount)
+    elseif Framework == 'ox' then
+        if type == 'cash' or type == 'money' then
+            exports.ox_inventory:AddItem(source, ConvertMoneyType(type), amount)
+        else
+            local accountId = Ox.GetCharacterAccount(source).id
+            Ox.DepositMoney(source, accountId, amount)
+        end
     else
         -- Add custom framework here
     end
@@ -178,22 +205,18 @@ end
 --- @param source number Player ID
 --- @param item string Item to add
 --- @param count number Quantity to add
-function AddItem(source, item, count)
+--- @param metadata any|table Optional metadata
+function AddItem(source, item, count, metadata)
+    if count <= 0 then return end
     local player = GetPlayer(source)
     if not player then return end
-    if item == 'cash' or item == 'money' or item == 'bank' then
-        return AddMoney(source, item, count)
-    end
     if Inventory then
         if Inventory == 'ox_inventory' then
-            exports[Inventory]:AddItem(source, item, count)
+            exports[Inventory]:AddItem(source, item, count, metadata)
+        elseif Inventory == 'core_inventory' then
+            exports[Inventory]:addItem(source, item, count, metadata)
         else
-            if Config.Setup.metadata and item == 'markedbills' then
-                local worth = { worth = count }
-                exports[Inventory]:AddItem(source, item, 1, nil, worth)
-            else
-                exports[Inventory]:AddItem(source, item, count)
-            end
+            exports[Inventory]:AddItem(source, item, count, nil, metadata)
             if Framework == 'qb' then
                 TriggerClientEvent(Inventory.. ':client:ItemBox', source, QBCore.Shared.Items[item], 'add')
             end
@@ -202,7 +225,7 @@ function AddItem(source, item, count)
         if Framework == 'esx' then
             player.addInventoryItem(item, count)
         elseif Framework == 'qb' then
-            player.Functions.AddItem(item, count)
+            player.Functions.AddItem(item, count, nil, metadata)
         else
             -- Add custom framework here
         end
@@ -217,9 +240,13 @@ function RemoveItem(source, item, count)
     local player = GetPlayer(source)
     if not player then return end
     if Inventory then
-        exports[Inventory]:RemoveItem(source, item, count)
-        if Framework == 'qb' then
-            TriggerClientEvent(Inventory.. ':client:ItemBox', source, QBCore.Shared.Items[item], 'remove')
+        if Inventory == 'core_inventory' then
+            exports[Inventory]:removeItem(source, item, count)
+        else
+            exports[Inventory]:RemoveItem(source, item, count)
+            if Framework == 'qb' then
+                TriggerClientEvent(Inventory.. ':client:ItemBox', source, QBCore.Shared.Items[item], 'remove')
+            end
         end
     else
         if Framework == 'esx' then

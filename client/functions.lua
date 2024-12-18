@@ -1,22 +1,23 @@
+-- Initialize config(s)
+local sh_config = require 'config.shared'
+
 -- Display a notification
 --- @param message string
 --- @param type string
-ShowNotification = function(message, type)
-    if Config.Setup.notify == 'ox_lib' then
-        lib.notify({ title = 'Convenience Store', description = message, type = type, position = 'top', icon = 'fas fa-store' })
-    elseif Config.Setup.notify == 'esx' then
+function ShowNotification(message, type)
+    if sh_config.setup.notify == 'ox_lib' then
+        lib.notify({ description = message, type = type, position = 'top', icon = 'fas fa-store' })
+    elseif sh_config.setup.notify == 'esx' then
         ESX.ShowNotification(message)
-    elseif Config.Setup.notify == 'qb' then
+    elseif sh_config.setup.notify == 'qb' then
         QBCore.Functions.Notify(message, type)
-    elseif Config.Setup.notify == 'okok' then
+    elseif sh_config.setup.notify == 'okok' then
         exports['okokNotify']:Alert('Convenience Store', message, 5000, type, false)
-    elseif Config.Setup.notify == 'sd-notify' then
+    elseif sh_config.setup.notify == 'sd-notify' then
         exports['sd-notify']:Notify('Convenience Store', message, type)
-    elseif Config.Setup.notify == 'wasabi_notify' then
+    elseif sh_config.setup.notify == 'wasabi_notify' then
         exports.wasabi_notify:notify('Convenience Store', message, 5000, type, false, 'fas fa-store')
-    elseif Config.Setup.notify == 'mythic_notify' then
-        exports['mythic_notify']:DoHudText(type, message, 5000)
-    elseif Config.Setup.notify == 'custom' then
+    elseif sh_config.setup.notify == 'custom' then
         -- Add custom notification export/event here
     end
 end
@@ -30,7 +31,7 @@ end)
 
 -- Display a minigame
 --- @param data table
-Minigame = function(data)
+function Minigame(data)
     if lib.skillCheck(data.difficulty, data.inputs) then
         return true
     end
@@ -38,12 +39,12 @@ Minigame = function(data)
 end
 
 -- Display a progress bar
---- @param data table Config.Animations.X
-ProgressBar = function(data)
-    if Config.Setup.progress == 'ox_lib' then
-        -- Want to use ox_lib's progress bar instead of circle?
-        -- Change "progressCircle" to "progressBar" below & done!
-        if lib.progressCircle({
+--- @param data table
+function ProgressBar(data)
+    if sh_config.setup.progress == 'ox_lib' then
+        -- Want to use ox_lib's progress circle instead of bar?
+        -- Change "progressBar" to "progressCircle" below & done!
+        if lib.progressBar({
             label = data.label,
             duration = data.duration,
             position = data.position or 'bottom',
@@ -65,8 +66,8 @@ ProgressBar = function(data)
             return true
         end
         return false
-    elseif Config.Setup.progress == 'qbcore' then
-        local complete = false
+    elseif sh_config.setup.progress == 'qbcore' then
+        local p = promise.new()
         QBCore.Functions.Progressbar(data.label, data.label, data.duration, data.useWhileDead, data.canCancel, {
             disableMovement = data.disable.move,
             disableCarMovement = data.disable.car,
@@ -83,31 +84,29 @@ ProgressBar = function(data)
             rotation = data.prop.rot or nil
         }, {},
         function()
-            complete = true
+            p:resolve(true)
         end,
         function()
-            complete = false
+            p:resolve(false)
         end)
-        Wait(data.duration + 250)
-        return complete
+        return Citizen.Await(p)
     else
         -- Add 'custom' progress bar here
     end
 end
 
--- Function used for police dispatch systems
--- Can get coords & street name with data.coords & data.street if needed
---- @param data table
-PoliceDispatch = function(data)
-    if not data then print('Failed to retrieve dispatch data, cannot proceed.') return end
-    if Config.Police.dispatch == 'cd_dispatch' then
+-- Send police dispatch message
+--- @param data table data.coords, data.street
+function PoliceDispatch(data)
+    if not data then print('^1[ERROR]: Failed to retrieve dispatch data, cannot proceed^0') return end
+    if sh_config.police.dispatch == 'cd_dispatch' then
         local playerData = exports['cd_dispatch']:GetPlayerInfo()
         if not playerData then
-            print('cd_dispatch failed to return playerData, cannot proceed.')
+            print('^1[ERROR]: cd_dispatch failed to return playerData, cannot proceed^0')
             return
         end
         TriggerServerEvent('cd_dispatch:AddNotification', {
-            job_table = Config.Police.jobs,
+            job_table = sh_config.police.jobs,
             coords = playerData.coords,
             title = '10-88 - Store Robbery',
             message = 'An alarm has been triggered at 24/7 on ' ..playerData.street,
@@ -124,7 +123,7 @@ PoliceDispatch = function(data)
                 radius = 0,
             }
         })
-    elseif Config.Police.dispatch == 'ps-dispatch' then
+    elseif sh_config.police.dispatch == 'ps-dispatch' then
         local alert = {
             coords = data.coords,
             message = 'An alarm has been triggered at 24/7 on ' ..data.street,
@@ -137,15 +136,15 @@ PoliceDispatch = function(data)
             length = 3
         }
         exports["ps-dispatch"]:CustomAlert(alert)
-    elseif Config.Police.dispatch == 'qs-dispatch' then
+    elseif sh_config.police.dispatch == 'qs-dispatch' then
         local playerData = exports['qs-dispatch']:GetPlayerInfo()
         if not playerData then
-            print('qs-dispatch failed to return playerData, cannot proceed.')
+            print('^1[ERROR]: qs-dispatch failed to return playerData, cannot proceed^0')
             return
         end
         exports['qs-dispatch']:getSSURL(function(image)
             TriggerServerEvent('qs-dispatch:server:CreateDispatchCall', {
-                job = Config.Police.jobs,
+                job = sh_config.police.jobs,
                 callLocation = playerData.coords,
                 callCode = { code = '10-88', snippet = 'Store Robbery' },
                 message = 'An alarm has been triggered at 24/7 on ' ..playerData.street_1,
@@ -161,39 +160,39 @@ PoliceDispatch = function(data)
                 }
             })
         end)
-    elseif Config.Police.dispatch == 'core_dispatch' then
+    elseif sh_config.police.dispatch == 'core_dispatch' then
         local gender = IsPedMale(cache.ped) and 'male' or 'female'
         TriggerServerEvent('core_dispatch:addCall', '10-88', 'Potential Store Robbery',
         {{icon = 'fa-venus-mars', info = gender}},
         {data.coords.x, data.coords.y, data.coords.z},
         'police', 30000, 52, 1, false)
-    elseif Config.Police.dispatch == 'rcore_dispatch' then
+    elseif sh_config.police.dispatch == 'rcore_dispatch' then
         local playerData = exports['rcore_dispatch']:GetPlayerData()
-        exports['screenshot-basic']:requestScreenshotUpload('InsertWebhookLinkHERE', "files[]", function(val)
-            local image = json.decode(val)
-            local alert = {
-                code = '10-88 - Store Robbery',
-                default_priority = 'low',
-                coords = playerData.coords,
-                job = Config.Police.jobs,
-                text = 'An alarm has been triggered at 24/7 on ' ..playerData.street_1,
-                type = 'alerts',
-                blip_time = 30,
-                image = image.attachments[1].proxy_url,
-                blip = {
-                    sprite = 52,
-                    colour = 1,
-                    scale = 1.0,
-                    text = '10-88 - Store Robbery',
-                    flashes = false,
-                    radius = 0,
-                }
+        if not playerData then
+            print('^1[ERROR]: rcore_dispatch failed to return playerData, cannot proceed^0')
+            return
+        end
+        local alert = {
+            code = '10-88 - Store Robbery',
+            default_priority = 'low',
+            coords = playerData.coords,
+            job = sh_config.police.jobs,
+            text = 'An alarm has been triggered at 24/7 on ' ..playerData.street_1,
+            type = 'alerts',
+            blip_time = 30,
+            blip = {
+                sprite = 52,
+                colour = 1,
+                scale = 1.0,
+                text = '10-88 - Store Robbery',
+                flashes = false,
+                radius = 0,
             }
-            TriggerServerEvent('rcore_dispatch:server:sendAlert', alert)
-        end)
-    elseif Config.Police.dispatch == 'aty_dispatch' then
-        TriggerEvent('aty_dispatch:SendDispatch', 'Potential Store Robbery', '10-88', 52, Config.Police.jobs)
-    elseif Config.Police.dispatch == 'op-dispatch' then
+        }
+        TriggerServerEvent('rcore_dispatch:server:sendAlert', alert)
+    elseif sh_config.police.dispatch == 'aty_dispatch' then
+        TriggerEvent('aty_dispatch:SendDispatch', 'Potential Store Robbery', '10-88', 52, sh_config.police.jobs)
+    elseif sh_config.police.dispatch == 'op-dispatch' then
         local job = 'police'
         local text = 'An alarm has been triggered at 24/7 on ' ..data.street
         local coords = data.coords
@@ -201,48 +200,46 @@ PoliceDispatch = function(data)
         local title = '10-88 - Store Robbery'
         local panic = false
         TriggerServerEvent('Opto_dispatch:Server:SendAlert', job, title, text, coords, panic, id)
-    elseif Config.Police.dispatch == 'origen_police' then
+    elseif sh_config.police.dispatch == 'origen_police' then
         local alert = {
             coords = data.coords,
             title = '10-88 - Store Robbery',
             type = 'GENERAL',
             message = 'An alarm has been triggered at 24/7 on ' ..data.street,
-            job = Config.Police.jobs,
+            job = 'police',
         }
         TriggerServerEvent("SendAlert:police", alert)
-    elseif Config.Police.dispatch == 'emergencydispatch' then
-        TriggerServerEvent('emergencydispatch:emergencycall:new', Config.Police.jobs, '10-88 | Potential Store Robbery', data.coords, true)
-    elseif Config.Police.dispatch == 'custom' then
+    elseif sh_config.police.dispatch == 'emergencydispatch' then
+        TriggerServerEvent('emergencydispatch:emergencycall:new', 'police', '10-88 | Potential Store Robbery', data.coords, true)
+    elseif sh_config.police.dispatch == 'custom' then
         -- Add your custom dispatch system here
     else
-        print('No dispatch system was identified - please update your Config.Police.dispatch')
+        print('^1[ERROR]: No dispatch system was detected - please visit config/shared.lua "police" section^0')
     end
 end
 
--- Function to add circle target zones
+-- Add circle target zones
 --- @param data table
-AddCircleZone = function(data)
-    if Config.Setup.interact == 'ox_target' then
+function AddCircleZone(data)
+    if sh_config.setup.interact == 'ox_target' then
         exports.ox_target:addSphereZone(data)
-    elseif Config.Setup.interact == 'qb-target' then
+    elseif sh_config.setup.interact == 'qb-target' then
         exports['qb-target']:AddCircleZone(data.name, data.coords, data.radius, {
             name = data.name,
-            debugPoly = Config.Setup.debug}, {
+            debugPoly = sh_config.setup.debug}, {
             options = data.options,
             distance = 2,
         })
-    elseif Config.Setup.interact == 'interact' then
+    elseif sh_config.setup.interact == 'interact' then
         exports.interact:AddInteraction({
             coords = data.coords,
             interactDst = 2.0,
             id = data.name,
             options = data.options
         })
-    elseif Config.Setup.interact == 'textui' then
-        -- Coming soon..
-    elseif Config.Setup.interact == 'custom' then
+    elseif sh_config.setup.interact == 'custom' then
         -- Add support for a custom target system here
     else
-        print('No interaction system defined in the config file.')
+        print('^1[ERROR]: No interaction system was detected - please visit config/shared "setup" section^0')
     end
 end

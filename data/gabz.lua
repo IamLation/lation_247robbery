@@ -1,8 +1,5 @@
-You must replace the current Config.Locations table in config.lua with these ones if you use Gabz
-
--- Store location configs for Gabz 24/7's
-Config.Locations = {
-    Registers = {
+return {
+    registers = {
         vec3(25.4444, -1345.6597, 29.7458), -- Innocence Blvd
         vec3(-3040.8388, 585.0568, 8.1577), -- Inseno Road
         vec3(-3243.7705, 1001.1959, 13.1240), -- Barbareno Road
@@ -20,7 +17,7 @@ Config.Locations = {
         vec3(1164.1452, -322.7899, 69.3824), -- Mirror Park Blvd
         vec3(813.3516, -781.0529, 26.4238) -- Otto's Grotto
     },
-    Computers = {
+    computers = {
         vec3(29.5666, -1340.5445, 29.5400), -- Innocence Blvd
         vec3(-3046.9726, 587.3485, 7.9698), -- Inseno Road
         vec3(-3248.5605, 1005.7445, 12.8778), -- Barbareno Road
@@ -38,7 +35,7 @@ Config.Locations = {
         vec3(1158.9605, -315.2624, 69.2748), -- Mirror Park Blvd
         vec3(817.5401, -775.8287, 26.2710) -- Otto's Grotto
     },
-    Safes = {
+    safes = {
         vec3(31.5539, -1339.2442, 29.9318), -- Innocence Blvd
         vec3(-3048.7597, 588.8417, 8.3087), -- Inseno Road
         vec3(-3249.6362, 1007.7283, 13.2638), -- Barbareno Road

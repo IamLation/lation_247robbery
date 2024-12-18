@@ -11,6 +11,8 @@
         "policeCount",
         "QBCore",
         "QBShared",
-        "initiateRegisterRobbery"
+        "initiateRegisterRobbery",
+        "locale",
+        "name"
     ]
 }

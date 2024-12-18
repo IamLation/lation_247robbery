@@ -22,7 +22,7 @@ local function InitializeFramework()
         end)
 
         AddEventHandler('onResourceStart', function(resourceName)
-            if GetCurrentResourceName() ~= resourceName or not ESX.PlayerLoaded then return end
+            if GetCurrentResourceName() ~= resourceName then return end
             PlayerData = GetPlayerData()
             PlayerLoaded = true
             TriggerEvent('lation_247robbery:onPlayerLoaded')
@@ -64,7 +64,28 @@ local function InitializeFramework()
         end)
 
         AddEventHandler('onResourceStart', function(resourceName)
-            if GetCurrentResourceName() ~= resourceName or not LocalPlayer.state.isLoggedIn then return end
+            if GetCurrentResourceName() ~= resourceName then return end
+            PlayerData = GetPlayerData()
+            PlayerLoaded = true
+            TriggerEvent('lation_247robbery:onPlayerLoaded')
+        end)
+    elseif GetResourceState('ox_core') == 'started' then
+        Ox = require '@ox_core.lib.init'
+        Framework = 'ox'
+
+        AddEventHandler('ox:playerLoaded', function()
+            PlayerData = GetPlayerData()
+            PlayerLoaded = true
+            TriggerEvent('lation_247robbery:onPlayerLoaded')
+        end)
+
+        AddEventHandler('ox:playerLogout', function()
+            table.wipe(PlayerData)
+            PlayerLoaded = false
+        end)
+
+        AddEventHandler('onResourceStart', function(resourceName)
+            if GetCurrentResourceName() ~= resourceName then return end
             PlayerData = GetPlayerData()
             PlayerLoaded = true
             TriggerEvent('lation_247robbery:onPlayerLoaded')
@@ -84,12 +105,12 @@ local function InitializeInventory()
         Inventory = 'qs-inventory'
     elseif GetResourceState('ps-inventory') == 'started' then
         Inventory = 'ps-inventory'
-    elseif GetResourceState('lj-inventory') == 'started' then
-        Inventory = 'lj-inventory'
     elseif GetResourceState('origen_inventory') == 'started' then
         Inventory = 'origen_inventory'
     elseif GetResourceState('codem-inventory') == 'started' then
         Inventory = 'codem-inventory'
+    elseif GetResourceState('core_inventory') == 'started' then
+        Inventory = 'core_inventory'
     else
         -- Add custom inventory here
     end
@@ -103,6 +124,8 @@ function GetPlayerData()
         return QBCore.Functions.GetPlayerData()
     elseif Framework == 'qbx' then
         return exports.qbx_core:GetPlayerData()
+    elseif Framework == 'ox' then
+        return Ox.GetPlayer()
     else
         -- Add custom framework here
     end
@@ -117,17 +140,19 @@ function HasItem(item, amount)
     if Inventory then
         if Inventory == 'ox_inventory' then
             return exports[Inventory]:Search('count', item) >= amount
+        elseif Inventory == 'core_inventory' then
+            return exports[Inventory]:hasItem(item, amount)
         else
             return exports[Inventory]:HasItem(item, amount)
         end
     else
-        local playerData = GetPlayerData()
-        if not playerData then return false end
-        local inventory = Framework == 'esx' and playerData.inventory or playerData.items
+        local player = GetPlayerData()
+        if not player then return false end
+        local inventory = Framework == 'esx' and player.inventory or player.items
         if not inventory then return false end
-        for _, itemData in pairs(inventory) do
-            if itemData and itemData.name == item then
-                local count = itemData.amount or itemData.count or 0
+        for _, item_data in pairs(inventory) do
+            if item_data and item_data.name == item then
+                local count = item_data.amount or item_data.count or 0
                 if count >= amount then
                     return true
                 end

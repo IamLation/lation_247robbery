@@ -1,20 +1,22 @@
+-- Initialize config(s)
+local sh_config = require 'config.shared'
+local sv_config = require 'config.server'
+
 -- Initialize global state for cooldowns
 GlobalState.cooldown = false
 GlobalState.started = false
 
+-- Initialize proper coordinates
+local gabz = GetResourceState('cfx-gabz-247') == 'started'
+local fm = GetResourceState('cfx-fm-supermarkets') == 'started'
+local stores = gabz and require 'data.gabz' or fm and require 'data.fmshop' or require 'data.default'
+
 -- Initialize table to store known locations & robbery states
 local locations, states = {}, {}
 
--- Function used to make numbers prettier (Credits to ESX for the function)
---- @param value number
-local function GroupDigits(value)
-	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
-	return left .. (num:reverse():gsub('(%d%d%d)', '%1,'):reverse()) .. right
-end
-
 -- Builds local table containing all locations categorized
 local function InitializeStores()
-    for type, coords in pairs(Config.Locations) do
+    for type, coords in pairs(stores) do
         for _, location in pairs(coords) do
             if not locations[type:lower()] then locations[type:lower()] = {} end
             locations[type:lower()][#locations[type:lower()] + 1] = location
@@ -43,7 +45,7 @@ end
 local function CanPlayerRob(identifier)
     if not identifier then return false end
     local currentTime = os.time()
-    if Config.Setup.global.enable then
+    if sh_config.setup.global.enable then
         if GlobalState.cooldown or GlobalState.started then
             return false
         end
@@ -51,7 +53,7 @@ local function CanPlayerRob(identifier)
     if not states[identifier] then return true end
     local lastCompleted = states[identifier].completed
     if lastCompleted then
-        if (currentTime - lastCompleted) < Config.Setup.cooldown then
+        if (currentTime - lastCompleted) < sh_config.setup.cooldown then
             return false
         end
     end
@@ -61,7 +63,7 @@ end
 -- Starts & ends global cooldown if enabled
 local function StartCooldown()
     GlobalState.cooldown = true
-    local wait = math.floor(Config.Setup.global.duration * 1000)
+    local wait = math.floor(sh_config.setup.global.duration * 1000)
     SetTimeout(wait, function()
         GlobalState.cooldown = false
     end)
@@ -86,22 +88,22 @@ lib.callback.register('lation_247robbery:StartRobbery', function(source)
         EventLog('[main.lua]: lation_247robbery:StartRobbery: player not nearby any registers', 'error')
         return false
     end
-    local hasRequiredItem = GetItemCount(source, Config.Registers.item) >= 1
+    local hasRequiredItem = GetItemCount(source, sh_config.registers.item) >= 1
     if not hasRequiredItem then
-        TriggerClientEvent('lation_247robbery:Notify', source, Strings.Notify.missingItem, 'error')
+        TriggerClientEvent('lation_247robbery:Notify', source, locale('notify.missing-item'), 'error')
         EventLog('[main.lua]: lation_247robbery:StartRobbery: player missing required item', 'error')
         return false
     end
-    if Config.Police.require then
+    if sh_config.police.count > 0 then
         local police = GetPoliceCount()
-        if not police or police < Config.Police.count then
-            TriggerClientEvent('lation_247robbery:Notify', source, Strings.Notify.notEnoughPolice, 'error')
+        if not police or police < sh_config.police.count then
+            TriggerClientEvent('lation_247robbery:Notify', source, locale('notify.no-police'), 'error')
             EventLog('[main.lua]: lation_247robbery:StartRobbery: not enough police to start robbery', 'error')
             return false
         end
     end
     if not CanPlayerRob(identifier) then
-        TriggerClientEvent('lation_247robbery:Notify', source, Strings.Notify.registerCooldown, 'error')
+        TriggerClientEvent('lation_247robbery:Notify', source, locale('notify.cooldown'), 'error')
         EventLog('[main.lua]: lation_247robbery:StartRobbery: cooldown is still active (for player or global)', 'error')
         return false
     end
@@ -146,9 +148,9 @@ RegisterNetEvent('lation_247robbery:DoesLockpickBreak', function()
         EventLog('[main.lua]: lation_247robbery:DoesLockpickBreak: player not nearby any registers', 'error')
         return
     end
-    if math.random(100) <= Config.Registers.breakChance then
-        RemoveItem(source, Config.Registers.item, 1)
-        TriggerClientEvent('lation_247robbery:Notify', source, Strings.Notify.lockpickBroke, 'error')
+    if math.random(100) <= sh_config.registers.breakChance then
+        RemoveItem(source, sh_config.registers.item, 1)
+        TriggerClientEvent('lation_247robbery:Notify', source, locale('notify.item-broke'), 'error')
     end
     if GlobalState.started then GlobalState.started = false end
 end)
@@ -183,24 +185,37 @@ RegisterNetEvent('lation_247robbery:CompleteRegisterRobbery', function()
         EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: player not nearby any registers', 'error')
         return
     end
-    local data = Config.Registers.reward
-    if not data then
-        EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: unable to retrieve config data', 'error')
-        return
+    local police = sh_config.police.risk and GetPoliceCount() or 0
+    local items = {}
+    for _, add in pairs(sh_config.registers.reward) do
+        if math.random(100) <= add.chance then
+            local quantity = math.random(add.min, add.max)
+            if police > 0 then
+                local increase = 1 + (police * sh_config.police.percent / 100)
+                quantity = math.floor(quantity * increase)
+            end
+            if add.metadata then
+                AddItem(source, add.item, quantity, add.metadata)
+            else
+                if add.item == 'cash' or add.item == 'money' or add.item == 'bank' then
+                    AddMoney(source, add.item, quantity)
+                else
+                    AddItem(source, add.item, quantity)
+                end
+            end
+            items[#items + 1] = { item = add.item, quantity = quantity }
+        end
     end
-    local quantity = math.random(data.min, data.max)
-    if Config.Police.risk then
-        local police = GetPoliceCount()
-        local increase = 1 + (police * Config.Police.percent / 100)
-        quantity = math.floor(quantity * increase)
+    local rewards = ''
+    for _, reward in ipairs(items) do
+        rewards = rewards .. 'x' .. reward.quantity .. ' ' ..reward.item .. ', '
     end
+    rewards = rewards:sub(1, -3)
     states[identifier].state = 'completed'
     states[identifier].completed = os.time()
-    AddItem(source, data.item, quantity)
-    if Logs.Events.register_robbed then
-        local log = Strings.Logs.register_robbed.message
-        local message = string.format(log, tostring(name), tostring(identifier), tostring(GroupDigits(quantity)))
-        PlayerLog(source, Strings.Logs.register_robbed.title, message)
+    if sv_config.logs.events.register_robbed and #items > 0 then
+        ---@diagnostic disable-next-line: undefined-field
+        PlayerLog(source, locale('logs.register-robbed-title'), locale('logs.register-robbed-message', name, identifier, rewards))
     end
 end)
 
@@ -234,26 +249,39 @@ RegisterNetEvent('lation_247robbery:CompleteSafeRobbery', function()
         EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: player not nearby any safes', 'error')
         return
     end
-    local data = Config.Safes.reward
-    if not data then
-        EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: unable to retrieve safe reward config data', 'error')
-        return
+    local police = sh_config.police.risk and GetPoliceCount() or 0
+    local items = {}
+    for _, add in pairs(sh_config.safes.reward) do
+        if math.random(100) <= add.chance then
+            local quantity = math.random(add.min, add.max)
+            if police > 0 then
+                local increase = 1 + (police * sh_config.police.percent / 100)
+                quantity = math.floor(quantity * increase)
+            end
+            if add.metadata then
+                AddItem(source, add.item, quantity, add.metadata)
+            else
+                if add.item == 'cash' or add.item == 'money' or add.item == 'bank' then
+                    AddMoney(source, add.item, quantity)
+                else
+                    AddItem(source, add.item, quantity)
+                end
+            end
+            items[#items + 1] = { item = add.item, quantity = quantity }
+        end
     end
-    local quantity = math.random(data.min, data.max)
-    if Config.Police.risk then
-        local police = GetPoliceCount()
-        local increase = 1 + (police * Config.Police.percent / 100)
-        quantity = math.floor(quantity * increase)
+    local rewards = ''
+    for _, reward in ipairs(items) do
+        rewards = rewards .. 'x' .. reward.quantity .. ' ' ..reward.item .. ', '
     end
+    rewards = rewards:sub(1, -3)
     GlobalState.started = false
     states[identifier].state = nil
     states[identifier].completed = os.time()
-    AddItem(source, data.item, quantity)
     StartCooldown()
-    if Logs.Events.safe_robbed then
-        local log = Strings.Logs.safe_robbed.message
-        local message = string.format(log, tostring(name), tostring(identifier), tostring(GroupDigits(quantity)))
-        PlayerLog(source, Strings.Logs.safe_robbed.title, message)
+    if sv_config.logs.events.safe_robbed and #items > 0 then
+        ---@diagnostic disable-next-line: undefined-field
+        PlayerLog(source, locale('logs.safe-robbed-title'), locale('logs.safe-robbed-message', name, identifier, rewards))
     end
 end)
 
@@ -293,5 +321,4 @@ RegisterNetEvent('lation_247robbery:FailedRobbery', function()
     StartCooldown()
 end)
 
--- Populate local table with categorized coords
 InitializeStores()
