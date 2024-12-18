@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 lua54 'yes'
 game 'gta5'
-name = 'lation_247robbery'
+name 'lation_247robbery'
 author 'iamlation'
 version '1.5.0'
 repository 'https://github.com/IamLation/lation_247robbery'
