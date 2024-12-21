@@ -1,0 +1,44 @@
+{
+    "notify": {
+        "cancel-rob": "Přestal jsi vykrádat pokladnu.",
+        "cooldown": "Tohle se zdá jako špatný nápad - měl bych počkat.",
+        "no-police": "Ve městě není dostatek policistů.",
+        "missing-item": "Myslím, že by to bylo jednodušší, kdybych měl nějaký nástroj.",
+        "item-broke": "Zlomil jsi paklíč a nepodařilo se ti otevřít pokladnu.",
+        "failed-hack": "Nepodařilo se ti nabourat do počítače.",
+        "wrong-pin": "Tohle nevypadá správně... je to stále zamčené.",
+        "failed-limit": "Pokusil ses příliš mnohokrát a nepodařilo se ti vykrást obchod."
+    },
+    "target": {
+        "register": "Vykrást pokladnu",
+        "computer": "Přihlásit se",
+        "safe": "Odemknout"
+    },
+    "alerts": {
+        "note": {
+            "header": "**Nalezená poznámka**",
+            "content": "Našel jsi zajímavou poznámku pod pokladnou, na které jsou napsána pouze následující čísla: %s"
+        },
+        "hack": {
+            "header": "**Kód odhalen**",
+            "content": "Úspěšně ses naboural do počítače a našel jsi následující kód: %s"
+        }
+    },
+    "inputs": {
+        "questions": {
+            "header": "Bezpečnostní otázky"
+        },
+        "safe": {
+            "header": "Trezor obchodu",
+            "label": "Zadej PIN",
+            "desc": "Zadej PIN k odemknutí trezoru.",
+            "placeholder": "1234"
+        }
+    },
+    "logs": {
+        "register-robbed-title": "Pokladna vykradena",
+        "register-robbed-message": "%s (identifikátor: %s) úspěšně vykradl pokladnu za %s",
+        "safe-robbed-title": "Trezor vykraden",
+        "safe-robbed-message": "%s (identifikátor: %s) úspěšně vykradl trezor za %s"
+    }
+}
