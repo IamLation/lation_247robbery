@@ -1,0 +1,44 @@
+{
+    "notify": {
+        "cancel-rob": "Dejaste de robar la caja registradora",
+        "cooldown": "Esto parece una mala idea, debería esperar",
+        "no-police": "No hay suficientes policías en la ciudad",
+        "missing-item": "Creo que esto sería más fácil si tuviera una herramienta",
+        "item-broke": "Rompiste la ganzúa y fallaste al abrir la caja registradora",
+        "failed-hack": "Fallaste al hackear el ordenador",
+        "wrong-pin": "Esto no parece correcto... sigue bloqueado",
+        "failed-limit": "Fallaste demasiadas veces y no pudiste robar la tienda"
+    },
+    "target": {
+        "register": "Robar caja registradora",
+        "computer": "Iniciar sesión",
+        "safe": "Desbloquear"
+    },
+    "alerts": {
+        "note": {
+            "header": "**Nota encontrada**",
+            "content": "Encontraste una nota interesante debajo de la caja registradora con solo los siguientes números escritos: %s"
+        },
+        "hack": {
+            "header": "**Código encontrado**",
+            "content": "Hackeaste con éxito el ordenador y encontraste el siguiente código: %s"
+        }
+    },
+    "inputs": {
+        "questions": {
+            "header": "Preguntas de seguridad"
+        },
+        "safe": {
+            "header": "Caja fuerte de la tienda",
+            "label": "Introducir PIN",
+            "desc": "Introduce el PIN para desbloquear la caja fuerte",
+            "placeholder": "1234"
+        }
+    },
+    "logs": {
+        "register-robbed-title": "Caja registradora robada",
+        "register-robbed-message": "%s (identificador: %s) ha robado con éxito una caja registradora por %s",
+        "safe-robbed-title": "Caja fuerte robada",
+        "safe-robbed-message": "%s (identificador: %s) ha robado con éxito una caja fuerte por %s"
+    }
+}
