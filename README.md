@@ -104,6 +104,7 @@ Or by submitting a new issue on the Github page!
 If you've enjoyed (*or are enjoying*) this script, you'd probably really enjoy our other scripts! 
 
 * 🌿 [Advanced Weed Growing](https://lationscripts.com/product/weed-growing?utm_source=github&utm_medium=free-script)
+* ❄️ [Advanced Cocaine](https://lationscripts.com/product/coke-processing?utm_source=github&utm_medium=free-script)
 * 💉 [Advanced Meth Crafting](https://lationscripts.com/product/meth-crafting?utm_source=github&utm_medium=free-script)
 * 🔨 [Advanced Chop Shop](https://lationscripts.com/product/chop-shop?utm_source=github&utm_medium=free-script)
 * 💰 [Advanced Money Laundering](https://lationscripts.com/product/money-wash?utm_source=github&utm_medium=free-script)
