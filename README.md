@@ -21,7 +21,7 @@
     <a href="#more-scripts">More Scripts</a>
 </p>
 
-[![lation 247robbery youtube preview](https://img.lationscripts.com/products/store-robbery-thumbnail-preview.jpg)](https://www.youtube.com/watch?v=L5fWSR1G_mA)
+[![lation 247robbery youtube preview](https://img.lationscripts.com/other/store-robbery-thumbnail-preview.jpg)](https://www.youtube.com/watch?v=L5fWSR1G_mA)
 
 ## 🔑 Key Features
 
