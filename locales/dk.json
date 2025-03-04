@@ -1,0 +1,44 @@
+{
+    "notify": {
+        "cancel-rob": "Du stoppede med at berøve kassen",
+        "cooldown": "Det her virker som en dårlig ide - jeg burde vente",
+        "no-police": "Der er ikke nok politibetjente i byen", 
+        "missing-item": "Jeg tror det her ville være lettere hvis jeg havde et redskab",
+        "item-broke": "Du knækkede dirkesættet og kunne ikke åbne kassen",
+        "failed-hack": "Du mislykkedes med at hacke dig ind på computeren",
+        "wrong-pin": "Det her virker ikke rigtigt.. den er stadig låst",
+        "failed-limit": "Du fejlede for mange gange og mislykkedes med at berøve butikken"
+    },
+    "target": {
+        "register": "Berøv kasse",
+        "computer": "Log ind",
+        "safe": "Lås op"
+    },
+    "alerts": {
+        "note": {
+            "header": "**Note fundet**",
+            "content": "Du fandt en interessant note under kassen med intet andet end de følgende numre på den: %s"
+        },
+        "hack": {
+            "header": "**Kode udsat**",
+            "content": "Du hackede computeren med succes og fandt den følgende kode: %s"
+        }
+    },
+    "inputs": {
+        "questions": {
+            "header": "Sikkerheds spørgsmål"
+        },
+        "safe": {
+            "header": "Forretning pengeskab",
+            "label": "Tilføj PIN-kode",
+            "desc": "Tilføj PIN-koden for at låse pengeskabet op",
+            "placeholder": "1234"
+        }
+    },
+    "logs": {
+        "register-robbed-title": "Kasse berøvet",
+        "register-robbed-message": "%s (identifier: %s) har berøvet en kasse succesfuldt for %s",
+        "safe-robbed-title": "Pengeskabet berøvet",
+        "safe-robbed-message": "%s (identifier: %s) har berøvet et pengeskab succesfuldt for %s"
+    }
+}
