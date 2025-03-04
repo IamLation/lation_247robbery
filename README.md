@@ -55,7 +55,10 @@
   - & more
 * Locales support by [ox_lib](https://github.com/overextended/ox_lib)
   - en
-  - (looking for contributors - [learn more](https://github.com/lation-scripts/translations))
+  - es
+  - cs
+  - dk
+  - (looking for contributors - [learn more](https://github.com/IamLation/translations))
 * Customize requirements
   - Set required item to begin robbery
   - Require a specific number of police online
