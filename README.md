@@ -54,10 +54,7 @@
   - [Samuel](https://github.com/Samuels-Development/sd-notify)
   - & more
 * Locales support by [ox_lib](https://github.com/overextended/ox_lib)
-  - en
-  - es
-  - cs
-  - dk
+  - en, es, cs, etc
   - (looking for contributors - [learn more](https://github.com/IamLation/translations))
 * Customize requirements
   - Set required item to begin robbery
