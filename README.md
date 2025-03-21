@@ -21,7 +21,7 @@
     <a href="#more-scripts">More Scripts</a>
 </p>
 
-[![lation 247robbery youtube preview](https://img.lationscripts.com/products/store-robbery-thumbnail-preview.jpg)](https://www.youtube.com/watch?v=L5fWSR1G_mA)
+[![lation 247robbery youtube preview](https://img.lationscripts.com/other/store-robbery-thumbnail-preview.jpg)](https://www.youtube.com/watch?v=L5fWSR1G_mA)
 
 ## 🔑 Key Features
 
@@ -54,8 +54,8 @@
   - [Samuel](https://github.com/Samuels-Development/sd-notify)
   - & more
 * Locales support by [ox_lib](https://github.com/overextended/ox_lib)
-  - en
-  - (looking for contributors - [learn more](https://github.com/lation-scripts/translations))
+  - en, es, cs, etc
+  - (looking for contributors - [learn more](https://github.com/IamLation/translations))
 * Customize requirements
   - Set required item to begin robbery
   - Require a specific number of police online
@@ -104,6 +104,7 @@ Or by submitting a new issue on the Github page!
 If you've enjoyed (*or are enjoying*) this script, you'd probably really enjoy our other scripts! 
 
 * 🌿 [Advanced Weed Growing](https://lationscripts.com/product/weed-growing?utm_source=github&utm_medium=free-script)
+* ❄️ [Advanced Cocaine](https://lationscripts.com/product/coke-processing?utm_source=github&utm_medium=free-script)
 * 💉 [Advanced Meth Crafting](https://lationscripts.com/product/meth-crafting?utm_source=github&utm_medium=free-script)
 * 🔨 [Advanced Chop Shop](https://lationscripts.com/product/chop-shop?utm_source=github&utm_medium=free-script)
 * 💰 [Advanced Money Laundering](https://lationscripts.com/product/money-wash?utm_source=github&utm_medium=free-script)
