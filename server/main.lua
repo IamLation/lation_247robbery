@@ -135,9 +135,11 @@ RegisterNetEvent('lation_247robbery:DoesLockpickBreak', function()
         EventLog('[main.lua]: lation_247robbery:DoesLockpickBreak: unable to retrieve player identifier', 'error')
         return
     end
-    if not GlobalState.started then
-        EventLog('[main.lua]: lation_247robbery:RegisterIncomplete: global state wasnt initiated', 'error')
-        return
+    if sh_config.setup.global.enable then
+        if not GlobalState.started then
+            EventLog('[main.lua]: lation_247robbery:RegisterIncomplete: global state wasnt initiated', 'error')
+            return
+        end
     end
     if not states[identifier] or states[identifier].state ~= 'in_progress' then
         EventLog('[main.lua]: lation_247robbery:DoesLockpickBreak: robbery wasnt initiated for player', 'error')
@@ -176,9 +178,11 @@ RegisterNetEvent('lation_247robbery:CompleteRegisterRobbery', function()
         EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: robbery wasnt initiated for player', 'error')
         return
     end
-    if not GlobalState.started then
-        EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: global state wasnt initiated', 'error')
-        return
+    if sh_config.setup.global.enable then
+        if not GlobalState.started then
+            EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: global state wasnt initiated', 'error')
+            return
+        end
     end
     local isNearRegister = IsPlayerNearby(source, 'registers')
     if not isNearRegister then
@@ -236,9 +240,11 @@ RegisterNetEvent('lation_247robbery:CompleteSafeRobbery', function()
         EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: unable to retrieve player name', 'error')
         return
     end
-    if not GlobalState.started then
-        EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: global state wasnt initiated', 'error')
-        return
+    if sh_config.setup.global.enable then
+        if not GlobalState.started then
+            EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: global state wasnt initiated', 'error')
+            return
+        end
     end
     if not states[identifier] or states[identifier].state ~= 'completed' then
         EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: player has not completed the register robbery', 'error')
@@ -302,9 +308,11 @@ RegisterNetEvent('lation_247robbery:FailedRobbery', function()
         EventLog('[main.lua]: lation_247robbery:FailedRobbery: unable to retrieve player name', 'error')
         return
     end
-    if not GlobalState.started then
-        EventLog('[main.lua]: lation_247robbery:FailedRobbery: global state wasnt initiated', 'error')
-        return
+    if sh_config.setup.global.enable then
+        if not GlobalState.started then
+            EventLog('[main.lua]: lation_247robbery:FailedRobbery: global state wasnt initiated', 'error')
+            return
+        end
     end
     if not states[identifier] or states[identifier].state ~= 'completed' then
         EventLog('[main.lua]: lation_247robbery:FailedRobbery: robbery wasnt initiated for player', 'error')
