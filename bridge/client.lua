@@ -111,6 +111,8 @@ local function InitializeInventory()
         Inventory = 'codem-inventory'
     elseif GetResourceState('core_inventory') == 'started' then
         Inventory = 'core_inventory'
+    elseif GetResourceState('tgiann-inventory') == 'started' then
+        Inventory = 'tgiann-inventory'
     else
         -- Add custom inventory here
     end
