@@ -221,9 +221,7 @@ function AddItem(source, item, count, metadata)
             exports[Inventory]:addItem(source, item, count, metadata)
         else
             exports[Inventory]:AddItem(source, item, count, nil, metadata)
-            if Framework == 'qb' then
-                TriggerClientEvent(Inventory .. ':client:ItemBox', source, QBCore.Shared.Items[item], 'add')
-            end
+            -- TriggerClientEvent(Inventory .. ':client:ItemBox', source, QBCore.Shared.Items[item], 'add')
         end
     else
         if Framework == 'esx' then
@@ -248,9 +246,7 @@ function RemoveItem(source, item, count)
             exports[Inventory]:removeItem(source, item, count)
         else
             exports[Inventory]:RemoveItem(source, item, count)
-            if Framework == 'qb' then
-                TriggerClientEvent(Inventory .. ':client:ItemBox', source, QBCore.Shared.Items[item], 'remove')
-            end
+            -- TriggerClientEvent(Inventory .. ':client:ItemBox', source, QBCore.Shared.Items[item], 'remove')
         end
     else
         if Framework == 'esx' then
