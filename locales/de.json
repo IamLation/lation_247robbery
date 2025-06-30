@@ -1,0 +1,44 @@
+{
+    "notify": {
+        "cancel-rob": "Du hörst auf, die Kasse auszurauben",
+        "cooldown": "Geschäfte können nicht so oft ausgeraubt werden – bitte warte und versuche es später erneut",
+        "no-police": "Es sind nicht genügend Polizisten in der Stadt",
+        "missing-item": "Ich denke, das wäre einfacher, wenn ich ein Werkzeug hätte",
+        "item-broke": "Du hast das Dietrich-Set zerbrochen und konntest die Kasse nicht öffnen",
+        "failed-hack": "Du hast es nicht geschafft, den Computer zu hacken",
+        "wrong-pin": "Das scheint nicht richtig zu sein... es ist immer noch gesperrt",
+        "failed-limit": "Du hast zu oft versagt und konntest den Laden nicht ausrauben"
+    },
+    "target": {
+        "register": "Kasse ausrauben",
+        "computer": "Einloggen",
+        "safe": "Aufschließen"
+    },
+    "alerts": {
+        "note": {
+            "header": "**Notiz Gefunden**",
+            "content": "Du hast eine interessante Notiz unter der Kasse gefunden, auf der nur die folgenden Zahlen stehen: %s"
+        },
+        "hack": {
+            "header": "**Code Enthüllt**",
+            "content": "Du hast den Computer erfolgreich gehackt und den folgenden Code gefunden: %s"
+        }
+    },
+    "inputs": {
+        "questions": {
+            "header": "Sicherheitsfragen"
+        },
+        "safe": {
+            "header": "Ladentresor",
+            "label": "PIN eingeben",
+            "desc": "Gib die PIN ein, um den Tresor zu öffnen",
+            "placeholder": "1234"
+        }
+    },
+    "logs": {
+        "register-robbed-title": "Kasse ausgeraubt",
+        "register-robbed-message": "%s (Kennung: %s) hat erfolgreich eine Kasse für %s ausgeraubt",
+        "safe-robbed-title": "Tresor ausgeraubt",
+        "safe-robbed-message": "%s (Kennung: %s) hat erfolgreich einen Tresor für %s ausgeraubt"
+    }
+}
