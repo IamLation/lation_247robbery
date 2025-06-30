@@ -16,11 +16,11 @@
     },
     "alerts": {
         "note": {
-            "header": "**Notiz Gefunden**",
+            "header": "Notiz Gefunden",
             "content": "Du hast eine interessante Notiz unter der Kasse gefunden, auf der nur die folgenden Zahlen stehen: %s"
         },
         "hack": {
-            "header": "**Code Enthüllt**",
+            "header": "Code Enthüllt",
             "content": "Du hast den Computer erfolgreich gehackt und den folgenden Code gefunden: %s"
         }
     },

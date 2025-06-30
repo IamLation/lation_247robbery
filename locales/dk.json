@@ -16,11 +16,11 @@
     },
     "alerts": {
         "note": {
-            "header": "**Note fundet**",
+            "header": "Note fundet",
             "content": "Du fandt en interessant note under kassen med intet andet end de følgende numre på den: %s"
         },
         "hack": {
-            "header": "**Kode udsat**",
+            "header": "Kode udsat",
             "content": "Du hackede computeren med succes og fandt den følgende kode: %s"
         }
     },

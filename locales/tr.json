@@ -16,11 +16,11 @@
     },
     "alerts": {
         "note": {
-            "header": "**Not Bulundu**",
+            "header": "Not Bulundu",
             "content": "Kasayı açarken ilginç bir not buldun. Üzerinde sadece şu numaralar yazıyor: %s"
         },
         "hack": {
-            "header": "**Kod Ortaya Çıktı**",
+            "header": "Kod Ortaya Çıktı",
             "content": "Bilgisayarı başarılı bir şekilde hackledin ve şu kodu buldun: %s"
         }
     },

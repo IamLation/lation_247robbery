@@ -16,11 +16,11 @@
     },
     "alerts": {
         "note": {
-            "header": "**Nalezená poznámka**",
+            "header": "Nalezená poznámka",
             "content": "Našel jsi zajímavou poznámku pod pokladnou, na které jsou napsána pouze následující čísla: %s"
         },
         "hack": {
-            "header": "**Kód odhalen**",
+            "header": "Kód odhalen",
             "content": "Úspěšně ses naboural do počítače a našel jsi následující kód: %s"
         }
     },

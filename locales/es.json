@@ -16,11 +16,11 @@
     },
     "alerts": {
         "note": {
-            "header": "**Nota encontrada**",
+            "header": "Nota encontrada",
             "content": "Encontraste una nota interesante debajo de la caja registradora con solo los siguientes números escritos: %s"
         },
         "hack": {
-            "header": "**Código encontrado**",
+            "header": "Código encontrado",
             "content": "Hackeaste con éxito el ordenador y encontraste el siguiente código: %s"
         }
     },
