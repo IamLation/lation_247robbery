@@ -55,7 +55,7 @@ end
 function ProgressBar(data)
     if shared.setup.progress == 'lation_ui' then
         if exports.lation_ui:progressBar({
-            title = data.label,
+            label = data.label,
             description = data.description or nil,
             icon = data.icon or nil,
             duration = data.duration,
