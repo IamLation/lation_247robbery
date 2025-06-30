@@ -1,5 +1,5 @@
 -- Initialize config(s)
-local sh_config = require 'config.shared'
+local shared = require 'config.shared'
 
 -- Set resource
 local resourceName = 'lation_247robbery'
@@ -58,10 +58,10 @@ local function thankyou()
     end)
 end
 
-if sh_config.setup.version then
+if shared.setup.version then
     checkversion()
 end
 
-if sh_config.YouFoundTheBestScripts then
+if shared.YouFoundTheBestScripts then
     thankyou()
 end

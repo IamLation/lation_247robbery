@@ -2,7 +2,7 @@
 Framework, Inventory = nil, nil
 
 -- Initialize config(s)
-local sh_config = require 'config.shared'
+local shared = require 'config.shared'
 
 -- Get framework
 local function InitializeFramework()
@@ -98,7 +98,7 @@ end
 --- @return number
 function GetPoliceCount()
     local count, jobs = 0, {}
-    for _, job in pairs(sh_config.police.jobs) do
+    for _, job in pairs(shared.police.jobs) do
         jobs[job] = true
     end
     if Framework == 'esx' then

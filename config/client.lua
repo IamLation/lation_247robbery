@@ -11,6 +11,8 @@ return {
         },
         register = {
             label = 'Looting register..',
+            description = 'You begin emptying the register of all cash',
+            icon = 'fas fa-sack-dollar',
             duration = 30000,
             position = 'bottom',
             useWhileDead = false,
@@ -25,6 +27,8 @@ return {
         },
         safe = {
             label = 'Looting safe..',
+            description = 'You begin emptying the safe of all cash',
+            icon = 'fas fa-sack-dollar',
             duration = 30000,
             position = 'bottom',
             useWhileDead = false,

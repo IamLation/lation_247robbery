@@ -1,5 +1,5 @@
 -- Initialize config(s)
-local sh_config = require 'config.shared'
+local shared = require 'config.shared'
 local sv_config = require 'config.server'
 
 -- Initialize global state for cooldowns
@@ -45,7 +45,7 @@ end
 local function CanPlayerRob(identifier)
     if not identifier then return false end
     local currentTime = os.time()
-    if sh_config.setup.global.enable then
+    if shared.setup.global.enable then
         if GlobalState.cooldown or GlobalState.started then
             return false
         end
@@ -53,7 +53,7 @@ local function CanPlayerRob(identifier)
     if not states[identifier] then return true end
     local lastCompleted = states[identifier].completed
     if lastCompleted then
-        if (currentTime - lastCompleted) < sh_config.setup.cooldown then
+        if (currentTime - lastCompleted) < shared.setup.cooldown then
             return false
         end
     end
@@ -63,7 +63,7 @@ end
 -- Starts & ends global cooldown if enabled
 local function StartCooldown()
     GlobalState.cooldown = true
-    local wait = math.floor(sh_config.setup.global.duration * 1000)
+    local wait = math.floor(shared.setup.global.duration * 1000)
     SetTimeout(wait, function()
         GlobalState.cooldown = false
     end)
@@ -88,15 +88,15 @@ lib.callback.register('lation_247robbery:StartRobbery', function(source)
         EventLog('[main.lua]: lation_247robbery:StartRobbery: player not nearby any registers', 'error')
         return false
     end
-    local hasRequiredItem = GetItemCount(source, sh_config.registers.item) >= 1
+    local hasRequiredItem = GetItemCount(source, shared.registers.item) >= 1
     if not hasRequiredItem then
         TriggerClientEvent('lation_247robbery:Notify', source, locale('notify.missing-item'), 'error')
         EventLog('[main.lua]: lation_247robbery:StartRobbery: player missing required item', 'error')
         return false
     end
-    if sh_config.police.count > 0 then
+    if shared.police.count > 0 then
         local police = GetPoliceCount()
-        if not police or police < sh_config.police.count then
+        if not police or police < shared.police.count then
             TriggerClientEvent('lation_247robbery:Notify', source, locale('notify.no-police'), 'error')
             EventLog('[main.lua]: lation_247robbery:StartRobbery: not enough police to start robbery', 'error')
             return false
@@ -148,8 +148,8 @@ RegisterNetEvent('lation_247robbery:DoesLockpickBreak', function()
         EventLog('[main.lua]: lation_247robbery:DoesLockpickBreak: player not nearby any registers', 'error')
         return
     end
-    if math.random(100) <= sh_config.registers.breakChance then
-        RemoveItem(source, sh_config.registers.item, 1)
+    if math.random(100) <= shared.registers.breakChance then
+        RemoveItem(source, shared.registers.item, 1)
         TriggerClientEvent('lation_247robbery:Notify', source, locale('notify.item-broke'), 'error')
     end
     if GlobalState.started then GlobalState.started = false end
@@ -185,13 +185,13 @@ RegisterNetEvent('lation_247robbery:CompleteRegisterRobbery', function()
         EventLog('[main.lua]: lation_247robbery:CompleteRegisterRobbery: player not nearby any registers', 'error')
         return
     end
-    local police = sh_config.police.risk and GetPoliceCount() or 0
+    local police = shared.police.risk and GetPoliceCount() or 0
     local items = {}
-    for _, add in pairs(sh_config.registers.reward) do
+    for _, add in pairs(shared.registers.reward) do
         if math.random(100) <= add.chance then
             local quantity = math.random(add.min, add.max)
             if police > 0 then
-                local increase = 1 + (police * sh_config.police.percent / 100)
+                local increase = 1 + (police * shared.police.percent / 100)
                 quantity = math.floor(quantity * increase)
             end
             if add.metadata then
@@ -249,13 +249,13 @@ RegisterNetEvent('lation_247robbery:CompleteSafeRobbery', function()
         EventLog('[main.lua]: lation_247robbery:CompleteSafeRobbery: player not nearby any safes', 'error')
         return
     end
-    local police = sh_config.police.risk and GetPoliceCount() or 0
+    local police = shared.police.risk and GetPoliceCount() or 0
     local items = {}
-    for _, add in pairs(sh_config.safes.reward) do
+    for _, add in pairs(shared.safes.reward) do
         if math.random(100) <= add.chance then
             local quantity = math.random(add.min, add.max)
             if police > 0 then
-                local increase = 1 + (police * sh_config.police.percent / 100)
+                local increase = 1 + (police * shared.police.percent / 100)
                 quantity = math.floor(quantity * increase)
             end
             if add.metadata then

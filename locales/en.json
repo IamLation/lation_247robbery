@@ -16,11 +16,11 @@
     },
     "alerts": {
         "note": {
-            "header": "**Note Found**",
+            "header": "Note Found",
             "content": "You found an interesting note under the register with nothing but the following numbers written on it: %s"
         },
         "hack": {
-            "header": "**Code Exposed**",
+            "header": "Code Exposed",
             "content": "You successfully hacked the computer and find the following code: %s"
         }
     },

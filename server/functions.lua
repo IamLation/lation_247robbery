@@ -1,6 +1,6 @@
 -- Initialize config(s)
 local sv_config = require 'config.server'
-local sh_config = require 'config.shared'
+local shared = require 'config.shared'
 
 -- Check to see if fm-logs or fmsdk is started
 local fmlogs = GetResourceState('fm-logs') == 'started'
@@ -10,7 +10,7 @@ local fmsdk = GetResourceState('fmsdk') == 'started'
 --- @param message string Message contents
 --- @param type string Log type
 function EventLog(message, type)
-    if not message or not sh_config.setup.debug then return end
+    if not message or not shared.setup.debug then return end
     if sv_config.logs.service == 'fivemanage' then
         if not fmsdk then return end
         exports.fmsdk:LogMessage(type or 'info', message)

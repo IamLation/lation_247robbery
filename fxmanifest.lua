@@ -3,7 +3,7 @@ lua54 'yes'
 game 'gta5'
 name 'lation_247robbery'
 author 'iamlation'
-version '1.5.0'
+version '1.5.1'
 repository 'https://github.com/IamLation/lation_247robbery'
 description 'FiveM\'s most popular 24/7 store robbery script'
 
