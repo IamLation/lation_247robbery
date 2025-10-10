@@ -276,6 +276,17 @@ function PoliceDispatch(data)
         TriggerServerEvent("SendAlert:police", alert)
     elseif shared.police.dispatch == 'emergencydispatch' then
         TriggerServerEvent('emergencydispatch:emergencycall:new', 'police', '10-88 | Potential Store Robbery', data.coords, true)
+    elseif shared.police.dispatch == 'lb-tablet' then
+        local lb_alert = {
+            priority = 'high',
+            code = '10-88',
+			title = 'Store Robbery',
+			description = 'An alarm has been triggered at 24/7 on ' ..data.street,
+			location = { label = 'Store Robbery', coords = data.coords },
+			time = 300,
+			job = 'police',
+        }
+		exports["lb-tablet"]:AddDispatch(lb_alert)
     elseif shared.police.dispatch == 'custom' then
         -- Add your custom dispatch system here
     else
