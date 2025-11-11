@@ -211,7 +211,8 @@ end
 AddEventHandler('lation_247robbery:onPlayerLoaded', function()
     local gabz = GetResourceState('cfx-gabz-247') == 'started'
     local fm = GetResourceState('cfx-fm-supermarkets') == 'started'
-    local coords = gabz and require 'data.gabz' or fm and require 'data.fmshop' or require 'data.default'
+    local kingmaps = GetResourceState('kingmaps_247') == 'started'
+    local coords = gabz and require 'data.gabz' or fm and require 'data.fmshop' or kingmaps and require 'data.kingmaps' or require 'data.default'
     for key, coord in pairs(coords.registers) do
         local data = {
             name = 'cash_register' ..key,

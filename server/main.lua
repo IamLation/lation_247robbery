@@ -9,7 +9,8 @@ GlobalState.started = false
 -- Initialize proper coordinates
 local gabz = GetResourceState('cfx-gabz-247') == 'started'
 local fm = GetResourceState('cfx-fm-supermarkets') == 'started'
-local stores = gabz and require 'data.gabz' or fm and require 'data.fmshop' or require 'data.default'
+local kingmaps = GetResourceState('kingmaps_247') == 'started'
+local stores = gabz and require 'data.gabz' or fm and require 'data.fmshop' or kingmaps and require 'data.kingmaps' or require 'data.default'
 
 -- Initialize table to store known locations & robbery states
 local locations, states = {}, {}
