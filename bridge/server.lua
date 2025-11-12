@@ -38,6 +38,8 @@ local function InitializeInventory()
         Inventory = 'codem-inventory'
     elseif GetResourceState('core_inventory') == 'started' then
         Inventory = 'core_inventory'
+    elseif GetResourceState('tgiann-inventory') == 'started' then
+        Inventory = 'tgiann-inventory'
     else
         -- Add custom inventory here
     end
@@ -85,9 +87,9 @@ function GetName(source)
     if Framework == 'esx' then
         return player.getName()
     elseif Framework == 'qb' or Framework == 'qbx' then
-        return player.PlayerData.charinfo.firstname.. ' ' ..player.PlayerData.charinfo.lastname
+        return player.PlayerData.charinfo.firstname .. ' ' .. player.PlayerData.charinfo.lastname
     elseif Framework == 'ox' then
-        return player.get('firstName').. ' ' ..player.get('lastName')
+        return player.get('firstName') .. ' ' .. player.get('lastName')
     else
         -- Add custom framework here
     end
@@ -143,6 +145,8 @@ function GetItemCount(source, item)
             return exports[Inventory]:Search(source, 'count', item) or 0
         elseif Inventory == 'core_inventory' then
             return exports[Inventory]:getItemCount(source, item)
+        elseif Inventory == 'tgiann-inventory' then
+            return exports[Inventory]:GetItemCount(source, item)
         else
             local itemData = exports[Inventory]:GetItemByName(source, item)
             if not itemData then return 0 end
@@ -217,9 +221,7 @@ function AddItem(source, item, count, metadata)
             exports[Inventory]:addItem(source, item, count, metadata)
         else
             exports[Inventory]:AddItem(source, item, count, nil, metadata)
-            if Framework == 'qb' then
-                TriggerClientEvent(Inventory.. ':client:ItemBox', source, QBCore.Shared.Items[item], 'add')
-            end
+            -- TriggerClientEvent(Inventory .. ':client:ItemBox', source, QBCore.Shared.Items[item], 'add')
         end
     else
         if Framework == 'esx' then
@@ -244,9 +246,7 @@ function RemoveItem(source, item, count)
             exports[Inventory]:removeItem(source, item, count)
         else
             exports[Inventory]:RemoveItem(source, item, count)
-            if Framework == 'qb' then
-                TriggerClientEvent(Inventory.. ':client:ItemBox', source, QBCore.Shared.Items[item], 'remove')
-            end
+            -- TriggerClientEvent(Inventory .. ':client:ItemBox', source, QBCore.Shared.Items[item], 'remove')
         end
     else
         if Framework == 'esx' then
